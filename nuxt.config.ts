@@ -1,55 +1,22 @@
-import { defineNuxtConfig } from "nuxt/config";
-
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  modules: ['@nuxt/ui'],
+
   devtools: { enabled: true },
-  modules: ['@nuxt/content', '@nuxtjs/tailwindcss'],
-  css: ['~/assets/css/main.css'],
+
+  future: {
+    compatibilityVersion: 4,
+  },
+
+  compatibilityDate: '2025-07-08',
+
   runtimeConfig: {
+    betterAuthSecret: process.env.BETTER_AUTH_SECRET,
+    databaseUrl: process.env.DATABASE_URL,
+    resendApiKey: process.env.RESEND_API_KEY,
     public: {
-      enableVercelAnalytics: false,
-      giscusRepo: '',
-      giscusRepoId: '',
-      giscusCategory: 'General',
-      giscusCategoryId: ''
-    }
+      appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    },
   },
-  routeRules: {
-    '/articles/**': { isr: 3600 },
-    '/': { isr: 3600 }
-  },
-  vite: {
-    define: {
-      'process.env.DEBUG': false
-    }
-  },
-  app: {
-    head: {
-      title: 'Engineering Blog',
-      htmlAttrs: {
-        lang: 'pt-BR'
-      },
-      meta: [
-        {
-          name: 'viewport',
-          content: 'width=device-width, initial-scale=1'
-        },
-        {
-          name: 'description',
-          content: 'Blog de engenharia com artigos, notas de desenvolvimento e arquitetura front-end moderna em Nuxt.'
-        }
-      ]
-    }
-  },
-  content: {
-    build: {
-      markdown: {
-        toc: {
-          depth: 3,
-          searchDepth: 3
-        }
-      }
-    }
-  }
-});
+
+  css: ['~/assets/css/main.css'],
+})
