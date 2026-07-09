@@ -1,10 +1,6 @@
 import { createAuthClient } from 'better-auth/vue'
 
-export const authClient = createAuthClient({
-  baseURL: useRuntimeConfig().public.appUrl,
-})
-
-export const useAuthUser = () => useState<ReturnType<typeof authClient.useSession>['data']['value'] | null>('auth-user', () => null)
+export const authClient = createAuthClient()
 
 export async function signIn(email: string, password: string) {
   return authClient.signIn.email({ email, password })

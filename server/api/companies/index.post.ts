@@ -1,6 +1,4 @@
 import { z } from 'zod'
-import { prisma } from '~/server/utils/prisma'
-import { requireRole } from '~/server/utils/session'
 
 const schema = z.object({
   name: z.string().min(2),

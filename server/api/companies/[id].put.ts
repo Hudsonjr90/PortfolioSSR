@@ -1,6 +1,4 @@
 import { z } from 'zod'
-import { prisma } from '~/server/utils/prisma'
-import { requireRole } from '~/server/utils/session'
 
 const schema = z.object({
   name: z.string().min(2).optional(),
@@ -11,7 +9,7 @@ const schema = z.object({
   facebook: z.string().optional(),
   address: z.string().optional(),
   logo: z.string().url().optional(),
-  evolutionApiUrl: z.string().url().optional(),
+  evolutionApiUrl: z.string().url().optional().or(z.literal('')),
   evolutionApiToken: z.string().optional(),
   evolutionApiInstance: z.string().optional(),
 })

@@ -1,6 +1,3 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRole } from '~/server/utils/session'
-
 export default defineEventHandler(async (event) => {
   const session = await requireRole(event, ['ADVERTISER', 'ADMIN'])
   const id = getRouterParam(event, 'id')!

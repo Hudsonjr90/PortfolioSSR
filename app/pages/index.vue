@@ -33,10 +33,10 @@ const features = [
         </p>
         <div class="flex gap-4 justify-center flex-wrap">
           <NuxtLink to="/register">
-            <UButton size="xl" color="white" label="Quero agendar" icon="i-lucide-calendar" />
+            <UButton size="xl" color="primary" label="Quero agendar" icon="i-lucide-calendar" />
           </NuxtLink>
           <NuxtLink to="/register-business">
-            <UButton size="xl" variant="outline" color="white" label="Cadastrar minha empresa" icon="i-lucide-store" />
+            <UButton size="xl" variant="outline" label="Cadastrar minha empresa" icon="i-lucide-store" />
           </NuxtLink>
         </div>
       </div>

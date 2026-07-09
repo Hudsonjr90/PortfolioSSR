@@ -63,9 +63,9 @@ async function handleLogin() {
     <template #footer>
       <p class="text-sm text-center text-gray-500">
         Não tem conta?
-        <NuxtLink to="/register" class="text-primary-600 font-medium hover:underline">Cadastre-se</NuxtLink>
+        <NuxtLink to="/register" class="text-primary-600 font-medium hover:underline">Cadastrar cliente</NuxtLink>
         ou
-        <NuxtLink to="/register-business" class="text-primary-600 font-medium hover:underline">Cadastre sua empresa</NuxtLink>
+        <NuxtLink to="/register-business" class="text-primary-600 font-medium hover:underline">Cadastrar empresa</NuxtLink>
       </p>
     </template>
   </UCard>

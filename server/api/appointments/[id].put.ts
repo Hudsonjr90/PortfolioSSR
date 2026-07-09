@@ -1,7 +1,5 @@
 import { z } from 'zod'
-import { prisma } from '~/server/utils/prisma'
-import { requireSession } from '~/server/utils/session'
-import { sendAppointmentCancellation } from '~/server/utils/notifications/email'
+import { sendAppointmentCancellation } from '../../utils/notifications/email'
 
 const schema = z.object({
   status: z.enum(['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED']),
@@ -30,7 +28,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Sem permissão' })
   }
 
-  if (isClient && data.status !== 'CANCELLED') {
+  if (isClient && !isOwner && userRole !== 'ADMIN' && data.status !== 'CANCELLED') {
     throw createError({ statusCode: 403, statusMessage: 'Clientes só podem cancelar agendamentos' })
   }
 

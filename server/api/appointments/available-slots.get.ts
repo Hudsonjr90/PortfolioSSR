@@ -1,5 +1,3 @@
-import { prisma } from '~/server/utils/prisma'
-
 function generateSlots(start: string, end: string, duration: number): string[] {
   const slots: string[] = []
   const [sh, sm] = start.split(':').map(Number)

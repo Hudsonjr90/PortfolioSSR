@@ -2,7 +2,10 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { prisma } from './prisma'
 
+const baseURL = process.env.BETTER_AUTH_URL || process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
 export const auth = betterAuth({
+  baseURL,
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
@@ -17,7 +20,7 @@ export const auth = betterAuth({
       role: { type: 'string', required: false, defaultValue: 'CLIENT' },
     },
   },
-  trustedOrigins: [process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000'],
+  trustedOrigins: [baseURL],
 })
 
 export type Session = typeof auth.$Infer.Session

@@ -1,8 +1,6 @@
 import { z } from 'zod'
-import { prisma } from '~/server/utils/prisma'
-import { requireSession } from '~/server/utils/session'
-import { sendAppointmentConfirmation } from '~/server/utils/notifications/email'
-import { sendWhatsAppMessage, buildAppointmentMessage } from '~/server/utils/notifications/whatsapp'
+import { sendAppointmentConfirmation } from '../../utils/notifications/email'
+import { sendWhatsAppMessage, buildAppointmentMessage } from '../../utils/notifications/whatsapp'
 
 const schema = z.object({
   companyId: z.string(),

@@ -1,5 +1,3 @@
-import { prisma } from '~/server/utils/prisma'
-
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')!
 
@@ -16,7 +14,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Empresa não encontrada' })
   }
 
-  // Não expor campos sensíveis da Evolution API
   const { evolutionApiUrl, evolutionApiToken, evolutionApiInstance, ...safe } = company
   return safe
 })

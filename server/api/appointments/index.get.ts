@@ -1,6 +1,3 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireSession } from '~/server/utils/session'
-
 export default defineEventHandler(async (event) => {
   const session = await requireSession(event)
   const { companyId, date, status } = getQuery(event)
@@ -10,7 +7,8 @@ export default defineEventHandler(async (event) => {
 
   if (userRole === 'CLIENT') {
     where.clientId = session.user.id
-  } else if (userRole === 'ADVERTISER') {
+  }
+  else if (userRole === 'ADVERTISER') {
     const company = await prisma.company.findUnique({ where: { ownerId: session.user.id } })
     if (!company) return []
     where.companyId = company.id

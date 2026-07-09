@@ -1,6 +1,4 @@
 import { z } from 'zod'
-import { prisma } from '~/server/utils/prisma'
-import { requireRole } from '~/server/utils/session'
 
 const scheduleSchema = z.object({
   dayOfWeek: z.number().int().min(0).max(6),
