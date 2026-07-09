@@ -1,14 +1,14 @@
 import { auth } from './auth'
 import type { H3Event } from 'h3'
 
-export async function getSession(event: H3Event) {
+export async function getAuthSession(event: H3Event) {
   return auth.api.getSession({
     headers: getRequestHeaders(event) as unknown as Headers,
   })
 }
 
 export async function requireSession(event: H3Event) {
-  const session = await getSession(event)
+  const session = await getAuthSession(event)
   if (!session) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }

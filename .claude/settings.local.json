@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//mnt/d/personalReps/**)",
+      "Bash(dir \"d:\\\\personalReps\\\\Nuxt-Portfolio\")",
+      "PowerShell(Set-Location \"d:\\\\personalReps\\\\Nuxt-Portfolio\"; Get-ChildItem .claude -Force | ForEach-Object { $_.Name })",
+      "PowerShell(Set-Location \"d:\\\\personalReps\\\\Nuxt-Portfolio\"; Get-ChildItem -Force | ForEach-Object { $_.Name })"
+    ]
+  }
+}
