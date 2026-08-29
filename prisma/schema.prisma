@@ -22,7 +22,6 @@ model Profile {
   updatedAt DateTime @updatedAt
 
   experiences    Experience[]
-  technologies   Technology[]
   education      Education[]
   certifications Certification[]
   socialLinks    SocialLink[]
@@ -63,8 +62,6 @@ model Technology {
   updatedAt DateTime @updatedAt
 
   experiences ExperienceTechnology[]
-  Profile     Profile?               @relation(fields: [profileId], references: [id])
-  profileId   String?
 
   @@index([category])
   @@index([sortOrder])
