@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id        String  @id @default(cuid())
+  name      String
+  headline  String
+  shortBio  String  @db.Text
+  about     String  @db.Text
+  location  String?
+  avatarUrl String?
+  resumeUrl String?
+  email     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  experiences    Experience[]
+  technologies   Technology[]
+  education      Education[]
+  certifications Certification[]
+  socialLinks    SocialLink[]
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  profileId   String
+  company     String
+  role        String
+  description String    @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean   @default(false)
+  logoUrl     String?
+  sortOrder   Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile      Profile                @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  technologies ExperienceTechnology[]
+  testimonials Testimonial[]
+
+  @@index([profileId])
+  @@index([sortOrder])
+}
+
+model Technology {
+  id        String             @id @default(cuid())
+  name      String             @unique
+  category  TechnologyCategory
+  icon      String?
+  sortOrder Int                @default(0)
+  featured  Boolean            @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  experiences ExperienceTechnology[]
+  Profile     Profile?               @relation(fields: [profileId], references: [id])
+  profileId   String?
+
+  @@index([category])
+  @@index([sortOrder])
+}
+
+model ExperienceTechnology {
+  experienceId String
+  technologyId String
+
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  technology Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, technologyId])
+}
+
+model Education {
+  id          String    @id @default(cuid())
+  profileId   String
+  institution String
+  course      String
+  description String?   @db.Text
+  startDate   DateTime?
+  endDate     DateTime?
+  logoUrl     String?
+  sortOrder   Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([sortOrder])
+}
+
+model Certification {
+  id            String    @id @default(cuid())
+  profileId     String
+  name          String
+  issuer        String
+  issuedAt      DateTime?
+  credentialUrl String?
+  sortOrder     Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([sortOrder])
+}
+
+model SocialLink {
+  id        String  @id @default(cuid())
+  profileId String
+  platform  String
+  label     String
+  url       String
+  icon      String?
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([sortOrder])
+}
+
+model Testimonial {
+  id           String  @id @default(cuid())
+  experienceId String
+  name         String
+  role         String?
+  company      String?
+  content      String  @db.Text
+  avatarUrl    String?
+  sortOrder    Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@index([experienceId])
+  @@index([sortOrder])
+}
+
+enum TechnologyCategory {
+  FRONTEND
+  BACKEND
+  DATABASE
+  CLOUD
+  DEVOPS
+  ARCHITECTURE
+  OTHER
+}
