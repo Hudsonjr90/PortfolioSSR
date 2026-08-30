@@ -1,8 +1,9 @@
-import { findPortfolio } from '../repositories/portfolio.repository'
-import { defineEventHandler, createError } from 'h3'
+import { createError, defineEventHandler } from 'h3'
+
+import { getPortfolio } from '../services/portfolio.service'
 
 export default defineEventHandler(async () => {
-  const portfolio = await findPortfolio()
+  const portfolio = await getPortfolio()
 
   if (!portfolio) {
     throw createError({

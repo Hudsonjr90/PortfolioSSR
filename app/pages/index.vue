@@ -1,13 +1,20 @@
 <template>
-  <AppHeader />
+  <q-layout view="hHh lpR fFf">
+    <AppNavbar />
 
-  <main>
-    <HeroSection />
-    <AboutSection />
-    <StackSection />
-    <ExperienceSection />
-    <ContactSection />
-  </main>
+    <q-page-container>
+      <q-page>
+        <main>
+          <!-- <HeroSection />
+          <AboutSection />
+          <ExperienceSection />
+          <TechnologySection />
+          <EducationSection />
+          <ContactSection /> -->
+        </main>
+      </q-page>
+    </q-page-container>
 
-  <AppFooter />
+    <AppFooter />
+  </q-layout>
 </template>

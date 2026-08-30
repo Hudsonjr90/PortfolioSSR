@@ -1,7 +1,20 @@
-export default defineNuxtConfig({
-  modules: ['@nuxt/ui'],
+import { quasarOptions } from './quasar-options'
 
-  devtools: { enabled: true },
+export default defineNuxtConfig({
+  modules: ['nuxt-quasar-ui'],
+
+  quasar: quasarOptions,
+
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
+
+  devtools: {
+    enabled: true,
+  },
 
   future: {
     compatibilityVersion: 4,
@@ -13,12 +26,14 @@ export default defineNuxtConfig({
     betterAuthSecret: process.env.BETTER_AUTH_SECRET,
     databaseUrl: process.env.DATABASE_URL,
     resendApiKey: process.env.RESEND_API_KEY,
+
     public: {
-      appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      appUrl:
+        process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
     },
   },
 
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/styles/main.scss'],
 
   vite: {
     optimizeDeps: {
