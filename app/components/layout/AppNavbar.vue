@@ -1,131 +1,48 @@
+<script setup lang="ts">
+import logo from '~/assets/images/logow.webp'
+
+const menuItems = [
+  { label: 'Sobre', target: '#sobre' },
+  { label: 'Experiência', target: '#experiencia' },
+  { label: 'Tecnologias', target: '#tecnologias' },
+  { label: 'Formação', target: '#formacao' },
+  { label: 'Contato', target: '#contato' },
+]
+
+function scrollToSection(target: string) {
+  document.querySelector(target)?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  })
+}
+</script>
+
 <template>
   <q-header
+    class="bg-dark text-white"
     elevated
-    class="bg-dark wrapper backdrop-blur"
   >
-    <q-toolbar class="q-px-lg">
-
+    <q-toolbar class="q-px-lg wrapper">
       <q-toolbar-title>
-        <q-btn
-          flat
-          no-caps
-          label="Hudson Kennedy"
-          href="#home"
-          class="text-white"
+        <q-img
+          :src="logo"
+          alt="HK Dev"
+          fit="contain"
+          style="width: 100px; height: 50px"
         />
       </q-toolbar-title>
 
-      <div class="row items-center q-gutter-sm gt-sm">
+      <div class="row items-center q-gutter-sm">
         <q-btn
+          v-for="item in menuItems"
+          :key="item.target"
           flat
           no-caps
-          label="Sobre"
-          href="#about"
-          text-color="grey-3"
+          :label="item.label"
+          @click="scrollToSection(item.target)"
         />
-
-        <q-btn
-          flat
-          no-caps
-          label="Experiência"
-          href="#experience"
-          text-color="grey-3"
-        />
-
-        <q-btn
-          flat
-          no-caps
-          label="Tecnologias"
-          href="#technologies"
-          text-color="grey-3"
-        />
-
-        <q-btn
-          flat
-          no-caps
-          label="Formação"
-          href="#education"
-          text-color="grey-3"
-        />
-
-        <q-btn
-          unelevated
-          no-caps
-          color="primary"
-          label="Contato"
-          href="#contact"
-        />
+        
       </div>
-
-      <q-btn
-        flat
-        round
-        dense
-        icon="menu"
-        class="lt-md"
-        color="white"
-        aria-label="Abrir menu"
-      >
-        <q-menu>
-          <q-list style="min-width: 200px">
-            <q-item
-              v-close-popup
-              clickable
-              tag="a"
-              href="#about"
-            >
-              <q-item-section>
-                Sobre
-              </q-item-section>
-            </q-item>
-
-            <q-item
-              v-close-popup
-              clickable
-              tag="a"
-              href="#experience"
-            >
-              <q-item-section>
-                Experiência
-              </q-item-section>
-            </q-item>
-
-            <q-item
-              v-close-popup
-              clickable
-              tag="a"
-              href="#technologies"
-            >
-              <q-item-section>
-                Tecnologias
-              </q-item-section>
-            </q-item>
-
-            <q-item
-              v-close-popup
-              clickable
-              tag="a"
-              href="#education"
-            >
-              <q-item-section>
-                Formação
-              </q-item-section>
-            </q-item>
-
-            <q-item
-              v-close-popup
-              clickable
-              tag="a"
-              href="#contact"
-            >
-              <q-item-section>
-                Contato
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-btn>
-
     </q-toolbar>
   </q-header>
 </template>

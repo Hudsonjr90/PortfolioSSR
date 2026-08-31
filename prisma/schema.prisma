@@ -8,16 +8,13 @@ datasource db {
 }
 
 model Profile {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   headline  String
-  shortBio  String  @db.Text
-  about     String  @db.Text
+  shortBio  String   @db.Text
+  about     String   @db.Text
   location  String?
-  avatarUrl String?
-  resumeUrl String?
   email     String?
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

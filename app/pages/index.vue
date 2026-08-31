@@ -5,12 +5,17 @@
     <q-page-container>
       <q-page>
         <main>
-          <!-- <HeroSection />
+          <HeroSection />
           <AboutSection />
-          <ExperienceSection />
-          <TechnologySection />
-          <EducationSection />
-          <ContactSection /> -->
+          
+          <!-- <ExperienceSection /> -->
+
+          <!-- <TechnologySection /> -->
+
+          <!-- <EducationSection /> -->
+
+          <!-- <ContactSection /> -->
+
         </main>
       </q-page>
     </q-page-container>
