@@ -41,7 +41,7 @@ export default defineNuxtConfig({
     },
   },
 
-  app: {
+ app: {
   head: {
     link: [
       {

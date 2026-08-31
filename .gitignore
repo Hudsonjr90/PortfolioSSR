@@ -23,6 +23,7 @@ logs
 .env.*
 !.env.example
 .claude/
+.ohmyagent
 
 # Prisma migrations (descomente para versionar migrations)
 # prisma/migrations/

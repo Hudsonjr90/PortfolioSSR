@@ -31,7 +31,6 @@ const principles = [
     <div class="wrapper">
       <div class="row items-center q-col-gutter-xl">
 
-        <!-- Sobre -->
         <div class="col-12 col-md-7">
           <div class="text-overline text-primary">
             Sobre mim
@@ -46,7 +45,6 @@ const principles = [
           </div>
         </div>
 
-        <!-- Princípios -->
         <div class="col-12 col-md-5">
           <div class="text-overline text-primary">
             Como eu trabalho

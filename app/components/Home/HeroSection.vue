@@ -43,13 +43,6 @@ const { data: portfolio, pending, error } = usePortfolio();
           </div>
 
           <div class="row items-center q-gutter-sm">
-            <q-btn
-              color="primary"
-              icon="mdi-briefcase-outline"
-              label="Ver experiência"
-              href="#experiencia"
-            />
-
             <q-btn-dropdown
               outline
               color="primary"
@@ -66,7 +59,7 @@ const { data: portfolio, pending, error } = usePortfolio();
                   target="_blank"
                 >
                   <q-item-section avatar>
-                    <q-icon name="mdi-lightbulb-outline" />
+                    <q-icon name="mdi-lightbulb-on-outline" />
                   </q-item-section>
 
                   <q-item-section>
@@ -103,3 +96,5 @@ const { data: portfolio, pending, error } = usePortfolio();
     </div>
   </section>
 </template>
+
+<!--  -->

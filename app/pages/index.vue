@@ -8,7 +8,7 @@
           <HeroSection />
           <AboutSection />
           
-          <!-- <ExperienceSection /> -->
+          <ExperienceSection />
 
           <!-- <TechnologySection /> -->
 
