@@ -54,6 +54,7 @@ model Technology {
   icon      String?
   sortOrder Int                @default(0)
   featured  Boolean            @default(false)
+  level     TechnologyLevel    @default(INTERMEDIATE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -157,4 +158,11 @@ enum TechnologyCategory {
   DEVOPS
   ARCHITECTURE
   OTHER
+}
+
+enum TechnologyLevel {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+  ESPECIALIST
 }

@@ -13,9 +13,11 @@
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "db:check": "prisma format && prisma validate",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.1",
     "@prisma/adapter-neon": "^6.19.3",
     "@prisma/client": "^6.19.3",
     "@quasar/extras": "^2.0.4",

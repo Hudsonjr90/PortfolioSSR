@@ -2,15 +2,13 @@
   <q-layout view="hHh lpR fFf">
     <AppNavbar />
 
-    <q-page-container>
+    <q-page-container class="q-mb-md">
       <q-page>
         <main>
           <HeroSection />
           <AboutSection />
-          
           <ExperienceSection />
-
-          <!-- <TechnologySection /> -->
+          <TechnologySection />
 
           <!-- <EducationSection /> -->
 

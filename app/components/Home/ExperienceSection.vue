@@ -15,6 +15,17 @@ const sortedExperiences = computed(() => {
   })
 })
 
+const INITIAL_COUNT = 3
+const expanded = ref(false)
+
+const visibleExperiences = computed(() => {
+  if (expanded.value) {
+    return sortedExperiences.value
+  }
+
+  return sortedExperiences.value.slice(0, INITIAL_COUNT)
+})
+
 const layout = computed(() => {
   if (process.client) {
     if (window.innerWidth < 600) {
@@ -58,11 +69,22 @@ const layout = computed(() => {
         color="primary"
       >
         <ExperienceCard
-          v-for="experience in sortedExperiences"
+          v-for="experience in visibleExperiences"
           :key="experience.id"
           :experience="experience"
         />
       </q-timeline>
+
+      <div class="text-center q-mt-xl">
+        <q-btn
+          v-if="sortedExperiences.length > INITIAL_COUNT"
+          outline
+          color="primary"
+          :label="expanded ? 'Ver menos' : 'Ver mais'"
+          :icon-right="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+          @click="expanded = !expanded"
+        />
+      </div>
     </div>
   </q-section>
 </template>

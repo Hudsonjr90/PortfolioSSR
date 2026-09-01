@@ -76,6 +76,15 @@ import logo from "~/assets/images/logow.webp";
         <q-btn
           flat
           round
+          icon="mdi-email-outline"
+          aria-label="Email"
+          href="#"
+          target="_blank"
+        />
+
+        <q-btn
+          flat
+          round
           :icon="$q.dark.isActive ? 'mdi-weather-sunny' : 'mdi-weather-night'"
           :aria-label="
             $q.dark.isActive ? 'Ativar tema claro' : 'Ativar tema escuro'
