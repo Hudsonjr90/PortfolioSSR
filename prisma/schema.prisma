@@ -154,10 +154,11 @@ enum TechnologyCategory {
   FRONTEND
   BACKEND
   DATABASE
-  CLOUD
   DEVOPS
-  ARCHITECTURE
+  TESTING
   OTHER
+  DESIGN
+  AI
 }
 
 enum TechnologyLevel {

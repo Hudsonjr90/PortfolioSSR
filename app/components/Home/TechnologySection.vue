@@ -16,19 +16,16 @@ const technologyIcons: Record<string, string> = {
   CSS: 'logos:css-3',
   Sass: 'logos:sass',
   SCSS: 'logos:sass',
-
   JavaScript: 'logos:javascript',
   TypeScript: 'logos:typescript-icon',
-
   Vue: 'logos:vue',
   VueJS: 'logos:vue',
   Nuxt: 'logos:nuxt-icon',
   NuxtJS: 'logos:nuxt-icon',
-
   React: 'logos:react',
   Angular: 'logos:angular-icon',
-  NextJS: 'logos:nextjs-icon',
-  Quasar: 'logos:quasar',
+  'Next.js': 'logos:nextjs-icon',
+  Quasar: 'logos:quasar-icon',
   Tailwind: 'logos:tailwindcss-icon',
 
   Node: 'logos:nodejs-icon',
@@ -39,14 +36,13 @@ const technologyIcons: Record<string, string> = {
 
   PostgreSQL: 'logos:postgresql',
   MySQL: 'logos:mysql',
-  Prisma: 'logos:prisma',
+  Prisma: 'material-icon-theme:prisma',
   Redis: 'logos:redis',
 
   Docker: 'logos:docker-icon',
   Git: 'logos:git-icon',
-  GitHub: 'logos:github-icon',
+  GitHub: 'akar-icons:github-fill',
   GitLab: 'logos:gitlab',
-
   AWS: 'logos:aws',
   Vercel: 'logos:vercel-icon',
 
@@ -57,13 +53,10 @@ const technologyIcons: Record<string, string> = {
   Python: 'logos:python',
   Django: 'logos:django-icon',
   Vite: 'logos:vitejs',
-
   Java: 'logos:java',
   'Spring Boot': 'logos:spring-icon',
-
   PHP: 'logos:php',
   Laravel: 'logos:laravel',
-
   Go: 'logos:go',
 }
 
@@ -71,17 +64,25 @@ const categoryLabels: Record<string, string> = {
   frontend: 'Frontend',
   backend: 'Backend',
   database: 'Banco de dados',
-  cloud: 'Cloud',
   devops: 'DevOps & Cloud',
-  architecture: 'Arquitetura',
   testing: 'Testes',
-  other: 'Outros',
+  other: 'Ferramentas',
+  design: 'Design',
+  ai: 'Inteligência Artificial',
 }
 
 const levelLabels: Record<string, string> = {
   BASIC: 'Básico',
   INTERMEDIATE: 'Intermediário',
   ADVANCED: 'Avançado',
+  ESPECIALIST: 'Especialista',
+}
+
+const levelColors: Record<string, string> = {
+  BASIC: 'grey-7',
+  INTERMEDIATE: 'info',
+  ADVANCED: 'primary',
+  ESPECIALIST: 'accent',
 }
 
 function normalizeTechnologyName(name: string) {
@@ -119,6 +120,14 @@ function getLevelLabel(level: string | null) {
   return levelLabels[level] ?? level
 }
 
+function getLevelColor(level: string | null) {
+  if (!level) {
+    return 'grey-7'
+  }
+
+  return levelColors[level] ?? 'grey-7'
+}
+
 const categories = computed(() => {
   const technologies = portfolio.value?.technologies ?? []
 
@@ -149,6 +158,7 @@ const levels = computed(() => {
 
 const levelOptions = computed(() => [
   { label: 'Todos os níveis', value: 'Todos' },
+
   ...levels.value
     .filter((level) => level !== 'Todos')
     .map((level) => ({
@@ -159,7 +169,6 @@ const levelOptions = computed(() => [
 
 const filteredTechnologies = computed(() => {
   const technologies = portfolio.value?.technologies ?? []
-
   const term = (search.value ?? '').trim().toLowerCase()
 
   const filtered = technologies.filter((technology) => {
@@ -193,18 +202,27 @@ const filteredTechnologies = computed(() => {
 })
 
 const totalPages = computed(() =>
-  Math.max(1, Math.ceil(filteredTechnologies.value.length / PAGE_SIZE)),
+  Math.max(
+    1,
+    Math.ceil(filteredTechnologies.value.length / PAGE_SIZE),
+  ),
 )
 
 const paginatedTechnologies = computed(() => {
   const start = (currentPage.value - 1) * PAGE_SIZE
 
-  return filteredTechnologies.value.slice(start, start + PAGE_SIZE)
+  return filteredTechnologies.value.slice(
+    start,
+    start + PAGE_SIZE,
+  )
 })
 
-watch([search, selectedCategory, selectedLevel], () => {
-  currentPage.value = 1
-})
+watch(
+  [search, selectedCategory, selectedLevel],
+  () => {
+    currentPage.value = 1
+  },
+)
 </script>
 
 <template>
@@ -314,7 +332,7 @@ watch([search, selectedCategory, selectedLevel], () => {
         <div
           v-for="technology in paginatedTechnologies"
           :key="technology.id"
-          class="col-4 col-sm-3 col-md-2"
+          class="col-6 col-sm-4 col-md-3 col-lg-2"
         >
           <q-card
             flat
@@ -347,22 +365,19 @@ watch([search, selectedCategory, selectedLevel], () => {
                   {{ technology.name }}
                 </span>
 
-                <span class="text-caption text-grey-6 no-wrap q-ml-xs">
+                <span
+                  class="text-caption text-grey-6 no-wrap q-ml-xs"
+                >
                   {{ getCategoryLabel(technology.category) }}
                 </span>
               </div>
 
               <!-- Nível + Destaque -->
-              <div class="row justify-between items-center q-mt-xs">
-                <span class="text-caption text-grey-5">
-                  {{ getLevelLabel(technology.level) }}
-                </span>
-
+              <div class="row justify-center items-center q-mt-xs">
                 <q-badge
-                  v-if="technology.featured"
+                  :color="getLevelColor(technology.level)"
                   outline
-                  color="primary"
-                  label="Principal"
+                  :label="getLevelLabel(technology.level)"
                 />
               </div>
             </q-card-section>

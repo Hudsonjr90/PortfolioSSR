@@ -24,6 +24,7 @@ logs
 !.env.example
 .claude/
 .ohmyagent
+.monkeycode
 
 # Prisma migrations (descomente para versionar migrations)
 # prisma/migrations/
