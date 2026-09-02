@@ -57,7 +57,7 @@ const layout = computed(() => {
           Experiência profissional
         </div>
 
-        <div class="text-body1 text-grey-7 q-mt-md">
+        <div class="text-body1 q-mt-md">
           Uma trajetória construída através de diferentes desafios,
           produtos e experiências de desenvolvimento.
         </div>

@@ -40,7 +40,7 @@ const principles = [
             Experiência que gera resultado
           </div>
 
-          <div class="text-body1 text-grey-4">
+          <div class="text-body1">
             {{ portfolio?.profile?.about }}
           </div>
         </div>
@@ -60,7 +60,7 @@ const principles = [
               :key="principle.title"
               flat
               bordered
-              class="bg-dark"
+              class="bg-primary"
             >
               <q-card-section class="row items-center no-wrap q-gutter-md">
 
@@ -80,7 +80,7 @@ const principles = [
                     {{ principle.title }}
                   </div>
 
-                  <div class="text-body2 text-grey-5 q-mt-xs">
+                  <div class="text-body2 q-mt-xs">
                     {{ principle.description }}
                   </div>
                 </div>

@@ -7,68 +7,138 @@ const { data: portfolio } = usePortfolio()
 const PAGE_SIZE = 12
 
 const search = ref('')
-const selectedCategory = ref('Todos')
+const selectedCategory = ref('Todas')
 const selectedLevel = ref('Todos')
 const currentPage = ref(1)
 
 const technologyIcons: Record<string, string> = {
+  // Frontend
   HTML: 'logos:html-5',
   CSS: 'logos:css-3',
-  Sass: 'logos:sass',
-  SCSS: 'logos:sass',
   JavaScript: 'logos:javascript',
-  TypeScript: 'logos:typescript-icon',
-  Vue: 'logos:vue',
-  VueJS: 'logos:vue',
-  Nuxt: 'logos:nuxt-icon',
-  NuxtJS: 'logos:nuxt-icon',
-  React: 'logos:react',
   Angular: 'logos:angular-icon',
-  'Next.js': 'logos:nextjs-icon',
-  Quasar: 'logos:quasar-icon',
+  React: 'logos:react',
+  Vue: 'logos:vue',
+  Bootstrap: 'devicon:bootstrap',
+  TypeScript: 'logos:typescript-icon',
+  Sass: 'logos:sass',
+  Less: 'logos:less',
+  Redux: 'logos:redux',
+  Pinia: 'logos:pinia',
+  Vuetify: 'logos:vuetifyjs',
   Tailwind: 'logos:tailwindcss-icon',
+  Material: 'logos:material-ui',
+  GraphQL: 'logos:graphql',
+  Webpack: 'logos:webpack',
+  'Next.js': 'logos:nextjs-icon',
+  Nuxt: 'logos:nuxt-icon',
+  Quasar: 'devicon-plain:quasar',
+  Vite: 'logos:vitejs',
+  jQuery: 'logos:jquery',
+  Svelte: 'logos:svelte-icon',
 
+  // Backend
   Node: 'logos:nodejs-icon',
   NodeJS: 'logos:nodejs-icon',
-  NestJS: 'logos:nestjs',
   Express: 'simple-icons:express',
-  Fastify: 'logos:fastify',
+  Fastify: 'devicon-plain:fastify',
+  PHP: 'logos:php',
+  Python: 'logos:python',
+  Django: 'logos:django-icon',
+  Java: 'logos:java',
+  'Spring Boot': 'logos:spring-icon',
+  Laravel: 'logos:laravel',
+  'C#': 'logos:c-sharp',
+  '.NET': 'logos:dotnet',
+  Ruby: 'logos:ruby',
+  'Ruby on Rails': 'logos:rails',
+  Go: 'logos:go',
+  NestJS: 'logos:nestjs',
+  Prisma: 'material-icon-theme:prisma',
+  Swagger: 'logos:swagger',
+  gRPC: 'logos:grpc',
 
+  // Database
   PostgreSQL: 'logos:postgresql',
   MySQL: 'logos:mysql',
-  Prisma: 'material-icon-theme:prisma',
+  MongoDB: 'logos:mongodb',
+  Firebase: 'logos:firebase',
   Redis: 'logos:redis',
 
+  // DevOps & Cloud
   Docker: 'logos:docker-icon',
+  AWS: 'logos:aws',
+  Vercel: 'logos:vercel-icon',
+  Netlify: 'logos:netlify',
+  Heroku: 'logos:heroku',
+  Jenkins: 'logos:jenkins',
+  Terraform: 'logos:terraform',
+  Ansible: 'logos:ansible',
+  Kubernetes: 'logos:kubernetes',
+
+  // Testing
+  Jest: 'logos:jest',
+  Jasmine: 'logos:jasmine',
+  Cypress: 'devicon-plain:cypressio',
+  Playwright: 'logos:playwright',
+
+  // Versionamento / ferramentas
   Git: 'logos:git-icon',
   GitHub: 'akar-icons:github-fill',
   GitLab: 'logos:gitlab',
-  AWS: 'logos:aws',
-  Vercel: 'logos:vercel-icon',
+  Gitlab: 'logos:gitlab',
+  npm: 'devicon:npm-wordmark',
+  NPM: 'devicon:npm-wordmark',
+  Yarn: 'material-icon-theme:yarn',
+  Jira: 'logos:jira',
+  Markdown: 'logos:markdown',
+  Electron: 'logos:electron',
+  Postman: 'logos:postman',
+  Thunderclient: 'carbon:thunderstorm',
+  ESLint: 'logos:eslint',
+  Magento: 'logos:magento',
+  RubyMine: 'simple-icons:rubymine',
+  'VS Code': 'logos:visual-studio-code',
+  'IntelliJ IDEA': 'logos:intellij-idea',
+  Android: 'logos:android-icon',
+  DBeaver: 'logos:dbeaver',
+  ECharts: 'logos:echarts',
+  Eclipse: 'logos:eclipse',
+  Insomnia: 'logos:insomnia',
+  GoLand: 'logos:goland',
 
-  Jest: 'logos:jest',
-  Cypress: 'logos:cypress-icon',
-  Playwright: 'logos:playwright',
+  // Design
+  Figma: 'logos:figma',
+  Photoshop: 'logos:adobe-photoshop',
+  Sketch: 'logos:sketch',
+  'Adobe XD': 'logos:adobe-xd',
 
-  Python: 'logos:python',
-  Django: 'logos:django-icon',
-  Vite: 'logos:vitejs',
-  Java: 'logos:java',
-  'Spring Boot': 'logos:spring-icon',
-  PHP: 'logos:php',
-  Laravel: 'logos:laravel',
-  Go: 'logos:go',
+  // Outros
+  Wordpress: 'logos:wordpress-icon',
+  Shopify: 'logos:shopify',
+  Analytics: 'logos:google-analytics',
+  ADS: 'logos:google-ads',
+
+  // IA
+  Cursor: 'simple-icons:cursor',
+  Codex: 'carbon:ai-label',
+  Claude: 'simple-icons:claude',
+  Gemini: 'logos:google-gemini',
+  DeepSeek: 'simple-icons:deepseek',
+  ChatGPT: 'simple-icons:openai',
+  Copilot: 'logos:github-copilot',
+  OpenClaw: 'carbon:bot',
 }
 
 const categoryLabels: Record<string, string> = {
   frontend: 'Frontend',
   backend: 'Backend',
-  database: 'Banco de dados',
-  devops: 'DevOps & Cloud',
+  database: 'Database',
+  devops: 'DevOps',
   testing: 'Testes',
   other: 'Ferramentas',
   design: 'Design',
-  ai: 'Inteligência Artificial',
+  ai: 'IA',
 }
 
 const levelLabels: Record<string, string> = {
@@ -139,7 +209,7 @@ const categories = computed(() => {
     ),
   ]
 
-  return ['Todos', ...uniqueCategories]
+  return ['Todas', ...uniqueCategories]
 })
 
 const levels = computed(() => {
@@ -157,14 +227,17 @@ const levels = computed(() => {
 })
 
 const levelOptions = computed(() => [
-  { label: 'Todos os níveis', value: 'Todos' },
-
-  ...levels.value
-    .filter((level) => level !== 'Todos')
-    .map((level) => ({
+  ...levels.value.map((level) => ({
       label: levelLabels[level] ?? level,
       value: level,
-    })),
+  })),
+])
+
+const categoryOptions = computed(() => [
+  ...categories.value.map((category) => ({
+      label: getCategoryLabel(category),
+      value: category,
+  })),
 ])
 
 const filteredTechnologies = computed(() => {
@@ -178,7 +251,7 @@ const filteredTechnologies = computed(() => {
       technology.category.toLowerCase().includes(term)
 
     const matchesCategory =
-      selectedCategory.value === 'Todos' ||
+      selectedCategory.value === 'Todas' ||
       technology.category === selectedCategory.value
 
     const matchesLevel =
@@ -242,7 +315,7 @@ watch(
             Tecnologias e ferramentas
           </div>
 
-          <div class="text-body1 text-grey-7 q-mt-md">
+          <div class="text-body1 q-mt-md">
             Tecnologias e ferramentas que fazem parte da minha experiência
             profissional e dos projetos que desenvolvo.
           </div>
@@ -261,8 +334,8 @@ watch(
         bordered
         class="technology-toolbar q-mb-xl"
       >
-        <q-card-section class="q-pa-md">
-          <div class="row items-center q-col-gutter-md">
+        <q-card-section class="q-pa-md bg-none">
+          <div class="row items-center q-col-gutter-md justify-between">
             <!-- Busca -->
             <div class="col-12 col-md-4">
               <q-input
@@ -281,7 +354,7 @@ watch(
             </div>
 
             <!-- Nível -->
-            <div class="col-12 col-md-auto">
+            <div class="col-12 col-md-auto row">
               <q-select
                 v-model="selectedLevel"
                 :options="levelOptions"
@@ -289,37 +362,24 @@ watch(
                 dense
                 emit-value
                 map-options
-                class="level-select"
+                prefix="Nível:"
+                class="level-select q-mr-md"
                 aria-label="Filtrar por nível"
+              />
+
+              <q-select
+                v-model="selectedCategory"
+                :options="categoryOptions"
+                outlined
+                dense
+                emit-value
+                map-options
+                prefix="Categoria:"
+                class="category-select"
+                aria-label="Filtrar por categoria"
               />
             </div>
 
-            <!-- Categorias -->
-            <div class="col-12 col-md">
-              <q-scroll-area
-                horizontal
-                class="category-scroll"
-              >
-                <div class="row no-wrap q-gutter-sm">
-                  <q-btn
-                    v-for="category in categories"
-                    :key="category"
-                    :label="getCategoryLabel(category)"
-                    :outline="selectedCategory !== category"
-                    :unelevated="selectedCategory === category"
-                    :color="
-                      selectedCategory === category
-                        ? 'primary'
-                        : 'grey-7'
-                    "
-                    no-caps
-                    dense
-                    class="category-btn"
-                    @click="selectedCategory = category"
-                  />
-                </div>
-              </q-scroll-area>
-            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -372,7 +432,7 @@ watch(
                 </span>
               </div>
 
-              <!-- Nível + Destaque -->
+              <!-- Nível -->
               <div class="row justify-center items-center q-mt-xs">
                 <q-badge
                   :color="getLevelColor(technology.level)"
@@ -409,7 +469,7 @@ watch(
           <q-btn
             v-if="
               search ||
-              selectedCategory !== 'Todos' ||
+              selectedCategory !== 'Todas' ||
               selectedLevel !== 'Todos'
             "
             flat
@@ -419,7 +479,7 @@ watch(
             class="q-mt-md"
             @click="
               search = '';
-              selectedCategory = 'Todos';
+              selectedCategory = 'Todas';
               selectedLevel = 'Todos'
             "
           />
@@ -449,15 +509,11 @@ watch(
   border-radius: 12px;
 }
 
-.category-scroll {
-  max-width: 100%;
-}
-
-.category-btn {
-  border-radius: 8px;
-}
-
 .level-select {
+  min-width: 190px;
+}
+
+.category-select {
   min-width: 190px;
 }
 
@@ -489,7 +545,6 @@ watch(
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.04);
 }
 
 @media (max-width: 599px) {
