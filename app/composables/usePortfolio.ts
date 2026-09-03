@@ -17,6 +17,7 @@ export interface PortfolioTechnology {
   icon: string | null
   sortOrder: number
   featured: boolean
+  level: string
 }
 
 export interface PortfolioTestimonial {

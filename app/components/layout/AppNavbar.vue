@@ -4,7 +4,7 @@ import logo from "~/assets/images/logow.webp";
 </script>
 
 <template>
-  <q-header bordered class="bg-transparent text-white backdrop-blur">
+  <q-header bordered class="bg-transparent backdrop-blur">
     <q-toolbar class="wrapper q-px-md">
       <!-- Logo -->
       <q-toolbar-title class="col-auto">
@@ -76,6 +76,15 @@ import logo from "~/assets/images/logow.webp";
         <q-btn
           flat
           round
+          icon="mdi-email-outline"
+          aria-label="Email"
+          href="#"
+          target="_blank"
+        />
+
+        <q-btn
+          flat
+          round
           :icon="$q.dark.isActive ? 'mdi-weather-sunny' : 'mdi-weather-night'"
           :aria-label="
             $q.dark.isActive ? 'Ativar tema claro' : 'Ativar tema escuro'
@@ -87,7 +96,7 @@ import logo from "~/assets/images/logow.webp";
       <!-- Menu mobile -->
       <q-btn flat round icon="mdi-menu" class="lt-md">
         <q-menu>
-          <q-list style="min-width: 200px" class="bg-dark text-white">
+          <q-list style="min-width: 200px" class="bg-transparent ">
             <q-item clickable v-close-popup tag="a" href="#sobre">
               <q-item-section>Sobre</q-item-section>
             </q-item>

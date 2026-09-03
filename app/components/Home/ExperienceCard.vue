@@ -86,7 +86,7 @@ function formatDate(date: string | null) {
         {{ experience.company }}
       </div>
 
-      <div class="text-caption text-grey-6">
+      <div class="text-caption">
         {{
           experience.isCurrent
             ? 'Experiência atual'
@@ -96,7 +96,7 @@ function formatDate(date: string | null) {
     </div>
 
     <!-- Descrição -->
-    <div class="text-body1 text-grey-7 experience-description">
+    <div class="text-body1 experience-description">
       {{ experience.description }}
     </div>
 

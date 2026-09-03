@@ -14,8 +14,6 @@ export async function getPortfolio() {
     shortBio,
     about,
     location,
-    avatarUrl,
-    resumeUrl,
     email,
   } = data.profile
 
@@ -27,8 +25,6 @@ export async function getPortfolio() {
       shortBio,
       about,
       location,
-      avatarUrl,
-      resumeUrl,
       email,
     },
 
@@ -72,6 +68,7 @@ export async function getPortfolio() {
       icon: technology.icon,
       sortOrder: technology.sortOrder,
       featured: technology.featured,
+      level: technology.level,
     })),
 
     education: data.profile.education.map((education) => ({
