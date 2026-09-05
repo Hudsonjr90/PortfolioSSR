@@ -325,9 +325,9 @@ watch(
         </div>
 
         <div class="col-12 col-md-auto">
-          <div class="text-caption text-grey-6">
+          <q-chip class="text-caption bg-primary">
             {{ filteredTechnologies.length }} tecnologias
-          </div>
+          </q-chip>
         </div>
       </div>
 
@@ -430,7 +430,7 @@ watch(
                 </span>
 
                 <span
-                  class="text-caption text-grey-6 no-wrap q-ml-xs"
+                  class="text-caption text-primary no-wrap q-ml-xs"
                 >
                   {{ getCategoryLabel(technology.category) }}
                 </span>

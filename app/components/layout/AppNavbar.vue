@@ -1,172 +1,253 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from 'vue'
 
-import logo from "~/assets/images/logow.webp";
+import logo from '~/assets/images/logow.webp'
 
-const { data: portfolio } = usePortfolio();
+const { data: portfolio } = usePortfolio()
 
-const activeSection = ref<string | null>(null);
+const activeSection = ref<string | null>(null)
 
 const sections = [
   {
-    id: "sobre",
-    label: "Sobre",
-    icon: "mdi-information-outline",
+    id: 'sobre',
+    label: 'Sobre',
+    icon: 'mdi-information-outline',
   },
   {
-    id: "formacoes",
-    label: "Formações",
-    icon: "mdi-folder-outline",
+    id: 'formacoes',
+    label: 'Formações',
+    icon: 'mdi-folder-outline',
   },
   {
-    id: "experiencia",
-    label: "Experiências",
-    icon: "mdi-briefcase-outline",
+    id: 'experiencia',
+    label: 'Experiências',
+    icon: 'mdi-briefcase-outline',
   },
   {
-    id: "tecnologias",
-    label: "Tecnologias",
-    icon: "mdi-laptop",
+    id: 'depoimentos',
+    label: 'Depoimentos',
+    icon: 'mdi-comment-outline',
   },
   {
-    id: "depoimentos",
-    label: "Depoimentos",
-    icon: "mdi-comment-outline",
+    id: 'tecnologias',
+    label: 'Tecnologias',
+    icon: 'mdi-laptop',
   },
   {
-    id: "contato",
-    label: "Contato",
-    icon: "mdi-phone-outline",
+    id: 'contato',
+    label: 'Contato',
+    icon: 'mdi-phone-outline',
   },
-];
+]
 
 const socialLinks = computed(() => {
   return [...(portfolio.value?.socialLinks ?? [])].sort(
     (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
-  );
-});
+  )
+})
 
 function normalize(value: string) {
   return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .trim();
+    .trim()
 }
 
 function findSocialUrl(platform: string) {
-  const normalizedPlatform = normalize(platform);
+  const normalizedPlatform = normalize(platform)
 
   const social = socialLinks.value.find(
     (item) => normalize(item.platform) === normalizedPlatform,
-  );
+  )
 
-  return social?.url ?? "";
+  return social?.url ?? ''
 }
 
 const githubUrl = computed(() => {
-  return findSocialUrl("github");
-});
+  return findSocialUrl('github')
+})
 
 const linkedinUrl = computed(() => {
-  return findSocialUrl("linkedin");
-});
+  return findSocialUrl('linkedin')
+})
 
 const whatsappUrl = computed(() => {
-  return findSocialUrl("whatsapp");
-});
+  return findSocialUrl('whatsapp')
+})
 
 function getSectionElement(id: string) {
-  return document.getElementById(id);
+  return document.getElementById(id)
 }
 
+/**
+ * Retorna a altura atual do header.
+ */
+function getHeaderHeight() {
+  const header = document.querySelector('.q-header') as HTMLElement | null
+
+  return header?.offsetHeight ?? 72
+}
+
+/**
+ * Atualiza a seção ativa com base na posição real
+ * das seções dentro da viewport.
+ *
+ * A região considerada para ativação fica logo abaixo
+ * do navbar, evitando trocar a seção cedo demais.
+ */
 function updateActiveSection() {
-  const header = document.querySelector(".q-header") as HTMLElement | null;
+  const headerHeight = getHeaderHeight()
 
-  const headerHeight = header?.offsetHeight ?? 72;
+  const activationLine =
+    window.scrollY + headerHeight + Math.min(180, window.innerHeight * 0.25)
 
-  const scrollPosition = window.scrollY + headerHeight + 120;
-
-  let currentSection: string | null = null;
+  let currentSection: string | null = null
 
   for (const section of sections) {
-    const element = getSectionElement(section.id);
+    const element = getSectionElement(section.id)
 
     if (!element) {
-      continue;
+      continue
     }
 
-    const sectionTop = element.getBoundingClientRect().top + window.scrollY;
+    const sectionTop =
+      element.getBoundingClientRect().top + window.scrollY
 
-    if (sectionTop <= scrollPosition) {
-      currentSection = section.id;
+    if (sectionTop <= activationLine) {
+      currentSection = section.id
     }
   }
 
-  activeSection.value = currentSection;
+  /**
+   * Quando chegamos ao final absoluto da página,
+   * força Contato como seção ativa.
+   *
+   * Isso resolve especialmente o caso em que a última
+   * seção não consegue ultrapassar a linha de ativação
+   * por causa do limite máximo do scroll.
+   */
+  const documentHeight = document.documentElement.scrollHeight
+  const viewportBottom = window.scrollY + window.innerHeight
+
+  const reachedPageBottom =
+    viewportBottom >= documentHeight - 8
+
+  if (reachedPageBottom) {
+    const contactElement = getSectionElement('contato')
+
+    if (contactElement) {
+      currentSection = 'contato'
+    }
+  }
+
+  activeSection.value = currentSection
 }
 
-let ticking = false;
+let ticking = false
 
 function handleScroll() {
   if (ticking) {
-    return;
+    return
   }
 
-  ticking = true;
+  ticking = true
 
   window.requestAnimationFrame(() => {
-    updateActiveSection();
-    ticking = false;
-  });
+    updateActiveSection()
+    ticking = false
+  })
 }
 
 function scrollToSection(id: string) {
-  const element = getSectionElement(id);
+  const element = getSectionElement(id)
 
   if (!element) {
-    return;
+    return
   }
 
-  activeSection.value = id;
+  activeSection.value = id
 
-  const header = document.querySelector(".q-header") as HTMLElement | null;
-
-  const headerHeight = header?.offsetHeight ?? 72;
+  const headerHeight = getHeaderHeight()
 
   const targetPosition =
-    element.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
+    element.getBoundingClientRect().top +
+    window.scrollY -
+    headerHeight -
+    12
 
   window.scrollTo({
     top: Math.max(targetPosition, 0),
-    behavior: "smooth",
-  });
+    behavior: 'smooth',
+  })
 
-  window.history.replaceState(null, "", `#${id}`);
+  window.history.replaceState(
+    null,
+    '',
+    `#${id}`,
+  )
 }
 
 function handleLogoClick() {
   window.scrollTo({
     top: 0,
-    behavior: "smooth",
-  });
+    behavior: 'smooth',
+  })
 
-  activeSection.value = null;
+  activeSection.value = null
 
-  window.history.replaceState(null, "", window.location.pathname);
+  window.history.replaceState(
+    null,
+    '',
+    window.location.pathname,
+  )
 }
 
 onMounted(async () => {
-  await nextTick();
+  await nextTick()
 
-  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener(
+    'scroll',
+    handleScroll,
+    {
+      passive: true,
+    },
+  )
 
-  updateActiveSection();
-});
+  window.addEventListener(
+    'resize',
+    handleScroll,
+    {
+      passive: true,
+    },
+  )
+
+  /**
+   * Pequeno atraso para garantir que todas as seções
+   * já tenham sido renderizadas e possuam suas alturas.
+   */
+  requestAnimationFrame(() => {
+    updateActiveSection()
+  })
+})
 
 onBeforeUnmount(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
+  window.removeEventListener(
+    'scroll',
+    handleScroll,
+  )
+
+  window.removeEventListener(
+    'resize',
+    handleScroll,
+  )
+})
 </script>
 
 <template>
@@ -184,7 +265,11 @@ onBeforeUnmount(() => {
           aria-label="Voltar ao início"
           @click.prevent="handleLogoClick"
         >
-          <img :src="logo" alt="HK Dev" height="42" />
+          <img
+            :src="logo"
+            alt="HK Dev"
+            height="42"
+          />
         </a>
       </q-toolbar-title>
 
@@ -249,10 +334,18 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- Menu mobile -->
-      <q-btn flat round icon="mdi-menu" class="lt-md" aria-label="Abrir menu">
+      <q-btn
+        flat
+        round
+        icon="mdi-menu"
+        class="lt-md"
+        aria-label="Abrir menu"
+      >
         <q-menu>
           <!-- Redes sociais -->
-          <div class="row justify-center q-gutter-sm q-pb-sm q-mt-sm">
+          <div
+            class="row justify-center q-gutter-sm q-pb-sm q-mt-sm"
+          >
             <q-btn
               v-if="githubUrl"
               flat
@@ -288,7 +381,10 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- Navegação -->
-          <q-list style="min-width: 200px" class="bg-transparent">
+          <q-list
+            style="min-width: 200px"
+            class="bg-transparent"
+          >
             <q-item
               v-for="section in sections"
               :key="section.id"
@@ -299,7 +395,11 @@ onBeforeUnmount(() => {
               @click="scrollToSection(section.id)"
             >
               <q-item-section avatar>
-                <q-icon :name="section.icon" size="18px" class="q-ml-sm" />
+                <q-icon
+                  :name="section.icon"
+                  size="18px"
+                  class="q-ml-sm"
+                />
               </q-item-section>
 
               <q-item-section>
