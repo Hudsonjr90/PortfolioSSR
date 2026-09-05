@@ -22,6 +22,7 @@
     "@prisma/client": "^6.19.3",
     "@quasar/extras": "^2.0.4",
     "better-auth": "^1.2.9",
+    "leaflet": "^1.9.4",
     "nuxt": "^4.4.2",
     "nuxt-quasar-ui": "^3.1.0",
     "quasar": "^2.28.0",
@@ -33,9 +34,11 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.6.2",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^24.13.3",
     "prisma": "^6.19.3",
     "tsx": "^4.23.12",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vue-tsc": "^3.3.11"
   }
 }

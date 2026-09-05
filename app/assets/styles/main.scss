@@ -6,8 +6,8 @@ html {
 
 body {
   margin: 0;
-  background-color: $light;
-  color: $dark;
+  background-color: $dark;
+  color: $light;
   font-family:
     Poppins,
     -apple-system,
@@ -21,5 +21,9 @@ body {
 
 ::selection {
   background: $primary;
-  color: $dark;
+  color: $light;
+}
+
+.text-grey-6 {
+  color: #94a3b8 !important;
 }

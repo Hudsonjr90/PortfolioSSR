@@ -56,7 +56,7 @@ const { data: portfolio, pending, error } = usePortfolio();
                   v-close-popup
                   tag="a"
                   href="/documents/HudsonKennedy.pdf"
-                  target="_blank"
+                  download="HudsonKennedy.pdf"
                 >
                   <q-item-section avatar>
                     <q-icon name="mdi-lightbulb-on-outline" />
@@ -72,7 +72,7 @@ const { data: portfolio, pending, error } = usePortfolio();
                   v-close-popup
                   tag="a"
                   href="/documents/HudsonKennedyAts.pdf"
-                  target="_blank"
+                  download="HudsonKennedyAts.pdf"
                 >
                   <q-item-section avatar>
                     <q-icon name="mdi-robot-outline" />

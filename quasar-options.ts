@@ -29,7 +29,7 @@ export const quasarOptions: ModuleOptions = {
   },
 
   config: {
-    dark: false,
+    dark: true,
     loading: {
       message: 'Carregando...',
       spinnerColor: 'primary',

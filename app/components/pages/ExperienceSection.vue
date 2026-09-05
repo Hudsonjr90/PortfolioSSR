@@ -42,7 +42,7 @@ const layout = computed(() => {
 </script>
 
 <template>
-  <q-section
+  <section
     id="experiencia"
     class="q-py-xl"
   >
@@ -86,5 +86,5 @@ const layout = computed(() => {
         />
       </div>
     </div>
-  </q-section>
+  </section>
 </template>

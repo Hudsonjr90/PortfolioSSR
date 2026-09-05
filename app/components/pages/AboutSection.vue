@@ -24,7 +24,7 @@ const principles = [
 </script>
 
 <template>
-  <q-section
+  <section
     id="sobre"
     class="q-py-xl"
   >
@@ -92,5 +92,5 @@ const principles = [
 
       </div>
     </div>
-  </q-section>
+  </section>
 </template>
