@@ -5,7 +5,6 @@
     <q-page-container class="q-mb-md">
       <q-page>
         <main>
-          <HeroSection />
           <AboutSection />
 
           <div class="wrapper q-my-xl">
@@ -23,11 +22,11 @@
             <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
           </div>
 
-          <!-- <TestimonialsSection />
+          <TestimonialSection />
 
            <div class="wrapper q-my-xl">
             <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
-          </div> -->
+          </div>
 
           <TechnologySection />
 
