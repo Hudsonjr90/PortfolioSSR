@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+
 import ExperienceCard from './ExperienceCard.vue'
+
+const { isMobile, timelineLayout } = useMobile()
+const isHydrated = ref(false)
 
 const { data: portfolio } = usePortfolio()
 
@@ -27,22 +32,20 @@ const visibleExperiences = computed(() => {
 })
 
 const layout = computed(() => {
-  if (process.client) {
-    if (window.innerWidth < 600) {
-      return 'dense'
-    }
-
-    if (window.innerWidth < 1024) {
-      return 'comfortable'
-    }
+  if (!isHydrated.value) {
+    return 'loose'
   }
 
-  return 'loose'
+  return timelineLayout.value
+})
+
+onMounted(() => {
+  isHydrated.value = true
 })
 </script>
 
 <template>
-  <q-section
+  <section
     id="experiencia"
     class="q-py-xl"
   >
@@ -53,7 +56,7 @@ const layout = computed(() => {
           Minha trajetória
         </div>
 
-        <div class="text-h3 text-weight-bold">
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
           Experiência profissional
         </div>
 
@@ -86,5 +89,5 @@ const layout = computed(() => {
         />
       </div>
     </div>
-  </q-section>
+  </section>
 </template>

@@ -4,7 +4,8 @@ import { Icon } from '@iconify/vue'
 
 const { data: portfolio } = usePortfolio()
 
-const PAGE_SIZE = 12
+const { techPageSize, isMobile } = useMobile()
+
 
 const search = ref('')
 const selectedCategory = ref('Todas')
@@ -34,7 +35,7 @@ const technologyIcons: Record<string, string> = {
   Nuxt: 'logos:nuxt-icon',
   Quasar: 'devicon-plain:quasar',
   Vite: 'logos:vitejs',
-  jQuery: 'logos:jquery',
+  jQuery: 'devicon:jquery',
   Svelte: 'logos:svelte-icon',
 
   // Backend
@@ -56,23 +57,23 @@ const technologyIcons: Record<string, string> = {
   NestJS: 'logos:nestjs',
   Prisma: 'material-icon-theme:prisma',
   Swagger: 'logos:swagger',
-  gRPC: 'logos:grpc',
+  gRPC: 'devicon:grpc',
 
   // Database
   PostgreSQL: 'logos:postgresql',
   MySQL: 'logos:mysql',
-  MongoDB: 'logos:mongodb',
-  Firebase: 'logos:firebase',
+  MongoDB: 'skill-icons:mongodb',
+  Firebase: 'devicon:firebase',
   Redis: 'logos:redis',
 
   // DevOps & Cloud
   Docker: 'logos:docker-icon',
-  AWS: 'logos:aws',
-  Vercel: 'logos:vercel-icon',
-  Netlify: 'logos:netlify',
-  Heroku: 'logos:heroku',
+  AWS: 'fa-brands:aws',
+  Vercel: 'skill-icons:vercel-light',
+  Netlify: 'selfhst:netlify',
+  Heroku: 'skill-icons:heroku',
   Jenkins: 'logos:jenkins',
-  Terraform: 'logos:terraform',
+  Terraform: 'devicon:terraform',
   Ansible: 'logos:ansible',
   Kubernetes: 'logos:kubernetes',
 
@@ -85,15 +86,14 @@ const technologyIcons: Record<string, string> = {
   // Versionamento / ferramentas
   Git: 'logos:git-icon',
   GitHub: 'akar-icons:github-fill',
-  GitLab: 'logos:gitlab',
-  Gitlab: 'logos:gitlab',
+  Gitlab: 'devicon:gitlab',
   npm: 'devicon:npm-wordmark',
   NPM: 'devicon:npm-wordmark',
   Yarn: 'material-icon-theme:yarn',
   Jira: 'logos:jira',
-  Markdown: 'logos:markdown',
+  Markdown: 'cib:markdown',
   Electron: 'logos:electron',
-  Postman: 'logos:postman',
+  Postman: 'skill-icons:postman',
   Thunderclient: 'carbon:thunderstorm',
   ESLint: 'logos:eslint',
   Magento: 'logos:magento',
@@ -101,9 +101,9 @@ const technologyIcons: Record<string, string> = {
   'VS Code': 'logos:visual-studio-code',
   'IntelliJ IDEA': 'logos:intellij-idea',
   Android: 'logos:android-icon',
-  DBeaver: 'logos:dbeaver',
-  ECharts: 'logos:echarts',
-  Eclipse: 'logos:eclipse',
+  DBeaver: 'devicon:dbeaver',
+  ECharts: 'thesvg-color:apache-echarts',
+  Eclipse: 'devicon:eclipse',
   Insomnia: 'logos:insomnia',
   GoLand: 'logos:goland',
 
@@ -114,7 +114,7 @@ const technologyIcons: Record<string, string> = {
   'Adobe XD': 'logos:adobe-xd',
 
   // Outros
-  Wordpress: 'logos:wordpress-icon',
+  Wordpress: 'skill-icons:wordpress',
   Shopify: 'logos:shopify',
   Analytics: 'logos:google-analytics',
   ADS: 'logos:google-ads',
@@ -126,7 +126,7 @@ const technologyIcons: Record<string, string> = {
   Gemini: 'logos:google-gemini',
   DeepSeek: 'simple-icons:deepseek',
   ChatGPT: 'simple-icons:openai',
-  Copilot: 'logos:github-copilot',
+  Copilot: 'devicon:githubcopilot',
   OpenClaw: 'carbon:bot',
 }
 
@@ -149,10 +149,10 @@ const levelLabels: Record<string, string> = {
 }
 
 const levelColors: Record<string, string> = {
-  BASIC: 'grey-7',
-  INTERMEDIATE: 'info',
-  ADVANCED: 'primary',
-  ESPECIALIST: 'accent',
+  BASIC: 'red-4',
+  INTERMEDIATE: 'yellow-7',
+  ADVANCED: 'green-7',
+  ESPECIALIST: 'blue-7',
 }
 
 function normalizeTechnologyName(name: string) {
@@ -277,16 +277,19 @@ const filteredTechnologies = computed(() => {
 const totalPages = computed(() =>
   Math.max(
     1,
-    Math.ceil(filteredTechnologies.value.length / PAGE_SIZE),
+    Math.ceil(
+      filteredTechnologies.value.length / techPageSize.value,
+    ),
   ),
 )
 
 const paginatedTechnologies = computed(() => {
-  const start = (currentPage.value - 1) * PAGE_SIZE
+  const start =
+    (currentPage.value - 1) * techPageSize.value
 
   return filteredTechnologies.value.slice(
     start,
-    start + PAGE_SIZE,
+    start + techPageSize.value,
   )
 })
 
@@ -299,7 +302,7 @@ watch(
 </script>
 
 <template>
-  <q-section
+  <section
     id="tecnologias"
     class="q-py-xl"
   >
@@ -311,7 +314,7 @@ watch(
             Stack tecnológica
           </div>
 
-          <div class="text-h3 text-weight-bold">
+          <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
             Tecnologias e ferramentas
           </div>
 
@@ -332,10 +335,10 @@ watch(
       <q-card
         flat
         bordered
-        class="technology-toolbar q-mb-xl"
+        class="technology-toolbar q-mb-xl bg-transparent"
       >
-        <q-card-section class="q-pa-md bg-none">
-          <div class="row items-center q-col-gutter-md justify-between">
+        <q-card-section class="q-pa-md">
+          <div class="row items-center q-col-gutter-md justify-between ">
             <!-- Busca -->
             <div class="col-12 col-md-4">
               <q-input
@@ -346,6 +349,7 @@ watch(
                 placeholder="Buscar tecnologia..."
                 aria-label="Buscar tecnologia"
                 @clear="search = ''"
+                class="search-input"
               >
                 <template #prepend>
                   <q-icon name="mdi-magnify" />
@@ -397,7 +401,7 @@ watch(
           <q-card
             flat
             bordered
-            class="technology-card full-height"
+            class="technology-card full-height bg-transparent"
           >
             <q-card-section class="technology-card-content">
               <!-- Ícone -->
@@ -501,7 +505,7 @@ watch(
         />
       </div>
     </div>
-  </q-section>
+  </section>
 </template>
 
 <style scoped>
@@ -516,6 +520,7 @@ watch(
 .category-select {
   min-width: 190px;
 }
+
 
 .technology-card {
   border-radius: 12px;
@@ -557,4 +562,14 @@ watch(
     height: 48px;
   }
 }
+
+@media screen and (max-width: 480px) {
+  .category-select {
+    min-width: 165px;
+  }
+  .level-select {
+    min-width: 165px;
+  }
+}
+
 </style>

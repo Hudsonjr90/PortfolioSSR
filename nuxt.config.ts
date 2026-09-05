@@ -29,7 +29,8 @@ export default defineNuxtConfig({
 
     public: {
       appUrl:
-        process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
+       process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
+       cartoApiKey: process.env.NUXT_PUBLIC_CARTO_API_KEY || '',
     },
   },
 

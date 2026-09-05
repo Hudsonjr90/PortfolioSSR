@@ -2,22 +2,45 @@
   <q-layout view="hHh lpR fFf">
     <AppNavbar />
 
-    <q-page-container class="q-mb-md">
-      <q-page>
+    <q-page-container class="q-mb-md" style="padding-top: 50px">
+      <q-page style="min-height: calc(100vh - 50px)">
         <main>
-          <HeroSection />
           <AboutSection />
+
+          <div class="wrapper q-my-xl">
+            <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
+          </div>
+
+          <EducationSection />
+           <div class="wrapper q-my-xl">
+            <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
+          </div>
+
           <ExperienceSection />
+
+          <div class="wrapper q-my-xl">
+            <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
+          </div>
+
+          <TestimonialSection />
+
+           <div class="wrapper q-my-xl">
+            <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
+          </div>
+
           <TechnologySection />
 
-          <!-- <EducationSection /> -->
+          <div class="wrapper q-my-xl">
+            <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
+          </div>
 
-          <!-- <ContactSection /> -->
+          <ContactSection />
 
         </main>
       </q-page>
     </q-page-container>
 
     <AppFooter />
+    <ScrollToTop />
   </q-layout>
 </template>
