@@ -170,7 +170,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-header bordered class="bg-transparent backdrop-blur">
+  <q-header
+    bordered
+    height-hint="50"
+    class="bg-transparent backdrop-blur"
+  >
     <q-toolbar class="wrapper q-px-md">
       <!-- Logo -->
       <q-toolbar-title class="col-auto">

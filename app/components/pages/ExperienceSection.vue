@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+
 import ExperienceCard from './ExperienceCard.vue'
 
-const { isMobile } = useMobile()
+const { isMobile, timelineLayout } = useMobile()
+const isHydrated = ref(false)
 
 const { data: portfolio } = usePortfolio()
 
@@ -29,17 +32,15 @@ const visibleExperiences = computed(() => {
 })
 
 const layout = computed(() => {
-  if (process.client) {
-    if (window.innerWidth < 600) {
-      return 'dense'
-    }
-
-    if (window.innerWidth < 1024) {
-      return 'comfortable'
-    }
+  if (!isHydrated.value) {
+    return 'loose'
   }
 
-  return 'loose'
+  return timelineLayout.value
+})
+
+onMounted(() => {
+  isHydrated.value = true
 })
 </script>
 

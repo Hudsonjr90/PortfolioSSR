@@ -2,8 +2,8 @@
   <q-layout view="hHh lpR fFf">
     <AppNavbar />
 
-    <q-page-container class="q-mb-md">
-      <q-page>
+    <q-page-container class="q-mb-md" style="padding-top: 50px">
+      <q-page style="min-height: calc(100vh - 50px)">
         <main>
           <AboutSection />
 

@@ -442,7 +442,7 @@ onBeforeUnmount(() => {
                 flat
                 bordered
                 clickable
-                class="testimonial-card"
+                class="testimonial-card bg-transparent"
                 @click="
                   openTestimonial(
                     testimonial,
@@ -575,7 +575,7 @@ onBeforeUnmount(() => {
               <q-btn
                 round
                 flat
-                color="primary"
+                class="bg-primary"
                 icon="mdi-chevron-left"
                 aria-label="Depoimento anterior"
                 @click="
@@ -591,7 +591,7 @@ onBeforeUnmount(() => {
               <q-btn
                 round
                 flat
-                color="primary"
+                class="bg-primary"
                 icon="mdi-chevron-right"
                 aria-label="Próximo depoimento"
                 @click="
