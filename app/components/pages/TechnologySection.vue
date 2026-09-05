@@ -4,7 +4,7 @@ import { Icon } from '@iconify/vue'
 
 const { data: portfolio } = usePortfolio()
 
-const { techPageSize } = useMobile()
+const { techPageSize, isMobile } = useMobile()
 
 
 const search = ref('')
@@ -314,7 +314,7 @@ watch(
             Stack tecnológica
           </div>
 
-          <div class="text-h3 text-weight-bold">
+          <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
             Tecnologias e ferramentas
           </div>
 

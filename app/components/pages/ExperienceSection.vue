@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import ExperienceCard from './ExperienceCard.vue'
 
+const { isMobile } = useMobile()
+
 const { data: portfolio } = usePortfolio()
 
 const sortedExperiences = computed(() => {
@@ -53,7 +55,7 @@ const layout = computed(() => {
           Minha trajetória
         </div>
 
-        <div class="text-h3 text-weight-bold">
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
           Experiência profissional
         </div>
 

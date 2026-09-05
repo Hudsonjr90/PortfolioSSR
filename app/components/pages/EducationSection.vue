@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 
 const { data: portfolio } = usePortfolio()
 
-const { pageSize } = useMobile()
+const { pageSize, isMobile } = useMobile()
 
 const totalPages = computed(() =>
   Math.max(
@@ -344,11 +344,11 @@ watch(totalPages, (pages) => {
           Formação acadêmica
         </div>
 
-        <div class="text-h3 text-weight-bold">
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
           Educação e aprendizado contínuo
         </div>
 
-        <div class="text-body1 text-grey-7 q-mt-md">
+        <div class="text-body1 q-mt-md">
           Minha trajetória reúne formação acadêmica, especializações,
           bootcamps e cursos voltados ao desenvolvimento de software,
           arquitetura, negócios e tecnologia.

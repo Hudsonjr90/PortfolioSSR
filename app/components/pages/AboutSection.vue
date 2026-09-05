@@ -2,6 +2,7 @@
 import profileImage from "~/assets/images/profile/home.webp";
 
 const { data: portfolio, pending, error } = usePortfolio();
+const { isMobile } = useMobile();
 
 
 const principles = [
@@ -44,22 +45,12 @@ const principles = [
 
       <div v-else-if="portfolio" class="row items-center q-col-gutter-xl">
         <div class="col-12 col-md-7">
-          <div class="q-mb-md">
-            <q-chip
-              v-if="portfolio.profile.location"
-              color="primary"
-              text-color="white"
-              icon="mdi-map-marker"
-            >
-              {{ portfolio.profile.location }}
-            </q-chip>
-          </div>
 
-          <div class="text-h2 text-weight-bold q-mb-md">
+          <div class="text-weight-bold q-mb-md" :class="isMobile ? 'text-h4' : 'text-h2'">
             {{ portfolio.profile.name }}
           </div>
 
-          <div class="text-h4 text-primary text-weight-medium q-mb-lg">
+          <div class="text-primary text-weight-medium q-mb-lg" :class="isMobile ? 'text-h5' : 'text-h4 '">
             {{ portfolio.profile.headline }}
           </div>
 
@@ -70,12 +61,11 @@ const principles = [
           <div class="row items-center q-gutter-sm">
             <q-btn-dropdown
               outline
-              color="primary"
               icon="mdi-file-document-outline"
               label="Meu currículo"
               no-caps
             >
-              <q-list class="bg-secondary text-white ">
+              <q-list class="bg-primary text-white ">
                 <q-item
                   clickable
                   v-close-popup
@@ -91,6 +81,8 @@ const principles = [
                     <q-item-label>Currículo Criativo</q-item-label>
                   </q-item-section>
                 </q-item>
+
+                <q-separator dark />
 
                 <q-item
                   clickable
@@ -113,7 +105,7 @@ const principles = [
         </div>
 
         <div class="col-12 col-md-5 flex flex-center">
-          <q-avatar size="280px" class="shadow-10">
+          <q-avatar :size="isMobile ? '200px' : '280px'" class="shadow-10">
             <img :src="profileImage" :alt="portfolio.profile.name" />
           </q-avatar>
         </div>
@@ -126,7 +118,7 @@ const principles = [
             Sobre mim
           </div>
 
-          <div class="text-h3 text-weight-bold q-mb-lg">
+          <div class="text-weight-bold q-mb-lg" :class="isMobile ? 'text-h4' : 'text-h3'">
             Experiência que gera resultado
           </div>
 
@@ -140,7 +132,7 @@ const principles = [
             Como eu trabalho
           </div>
 
-          <div class="text-h5 text-weight-bold q-mb-md">
+          <div class="text-weight-bold q-mb-md" :class="isMobile ? 'text-h5' : 'text-h4'">
             Engenharia com propósito
           </div>
 

@@ -21,6 +21,7 @@ import {
 } from '~/utils/global'
 
 const { data: portfolio } = usePortfolio()
+const { isMobile } = useMobile()
 
 const config = useRuntimeConfig()
 
@@ -276,13 +277,6 @@ async function initializeMap() {
       config.public.cartoApiKey ?? '',
     ).trim()
 
-    console.log(
-      'CARTO API KEY:',
-      apiKey
-        ? `configurada (${apiKey.length} caracteres)`
-        : 'NÃO CONFIGURADA',
-    )
-
     if (!apiKey) {
       console.warn(
         'CARTO API key não configurada.',
@@ -390,7 +384,7 @@ onBeforeUnmount(() => {
           Contato
         </div>
 
-        <div class="text-h3 text-weight-bold">
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
           Vamos conversar?
         </div>
 

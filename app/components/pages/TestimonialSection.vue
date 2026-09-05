@@ -19,6 +19,7 @@ interface TestimonialItem {
 }
 
 const { data: portfolio } = usePortfolio()
+const { isMobile } = useMobile()
 
 const currentSlide = ref(0)
 
@@ -29,7 +30,7 @@ const dialogVisible = ref(false)
 
 const isHovered = ref(false)
 
-const isMobile = ref(false)
+const isMobileModel = ref(false)
 
 const overflowingTestimonials =
   ref<Record<string, boolean>>({})
@@ -88,14 +89,14 @@ const totalSlides = computed(() => {
 
 function updateViewport() {
   const previousMobileState =
-    isMobile.value
+    isMobileModel.value
 
-  isMobile.value =
+  isMobileModel.value =
     window.innerWidth < 768
 
   if (
     previousMobileState !==
-    isMobile.value
+    isMobileModel.value
   ) {
     currentSlide.value = 0
   }
@@ -390,7 +391,7 @@ onBeforeUnmount(() => {
           Depoimentos
         </div>
 
-        <div class="text-h3 text-weight-bold">
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
           O que dizem sobre meu trabalho
         </div>
 
