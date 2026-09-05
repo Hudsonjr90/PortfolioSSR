@@ -12,7 +12,7 @@
           </div>
 
           <EducationSection />
-           <div class="wrapper q-my-xl">
+          <div class="wrapper q-my-xl">
             <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
           </div>
 
@@ -24,18 +24,18 @@
 
           <TestimonialSection />
 
-           <div class="wrapper q-my-xl">
+          <div class="wrapper q-my-xl">
             <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
           </div>
 
           <TechnologySection />
 
           <div class="wrapper q-my-xl">
-            <q-separator color="grey-8" class="q-mb-xl q-mt-xl" />
+            <q-separator color="grey-8" class="" />
           </div>
 
-          <ContactSection />
-
+          <ContactSection class="q-mb-xl" />
+          
         </main>
       </q-page>
     </q-page-container>

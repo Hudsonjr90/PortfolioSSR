@@ -23,14 +23,19 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-08',
 
   runtimeConfig: {
-    betterAuthSecret: process.env.BETTER_AUTH_SECRET,
-    databaseUrl: process.env.DATABASE_URL,
-    resendApiKey: process.env.RESEND_API_KEY,
+    // Variáveis privadas — disponíveis somente no servidor
+    betterAuthSecret: process.env.BETTER_AUTH_SECRET || '',
+    databaseUrl: process.env.DATABASE_URL || '',
+    resendApiKey: process.env.RESEND_API_KEY || '',
 
+    // Variáveis públicas — podem chegar ao frontend
     public: {
       appUrl:
-       process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
-       cartoApiKey: process.env.NUXT_PUBLIC_CARTO_API_KEY || '',
+        process.env.NUXT_PUBLIC_APP_URL ||
+        'http://localhost:3000',
+
+      cartoApiKey:
+        process.env.NUXT_PUBLIC_CARTO_API_KEY || '',
     },
   },
 
@@ -38,19 +43,22 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: ['@vue/devtools-core', '@vue/devtools-kit'],
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+      ],
     },
   },
 
- app: {
-  head: {
-    link: [
-      {
-        rel: 'icon',
-        type: 'image/png',
-        href: '/favicon.png',
-      },
-    ],
+  app: {
+    head: {
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/png',
+          href: '/favicon.png',
+        },
+      ],
+    },
   },
-},
 })
