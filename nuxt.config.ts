@@ -36,6 +36,38 @@ export default defineNuxtConfig({
   css: ['~/assets/styles/main.scss'],
 
   vite: {
+    plugins: [
+      {
+        name: 'quasar-hydration-fixtures-fix',
+
+        transform(code, id) {
+          if (
+            !id.includes('/__quasar/entry.mjs') &&
+            !id.includes('\\__quasar\\entry.mjs')
+          ) {
+            return
+          }
+
+          const filteredCode = code
+            .split('\n')
+            .filter(
+              (line) =>
+                !line.includes('.hydration.fixtures'),
+            )
+            .join('\n')
+
+          if (filteredCode === code) {
+            return
+          }
+
+          return {
+            code: filteredCode,
+            map: null,
+          }
+        },
+      },
+    ],
+
     optimizeDeps: {
       include: [
         '@vue/devtools-core',
