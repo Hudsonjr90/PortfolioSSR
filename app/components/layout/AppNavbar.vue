@@ -7,7 +7,7 @@ import {
   ref,
 } from 'vue'
 
-import logo from '~/assets/images/logow.webp'
+import logo from '~/assets/images/logo.png'
 
 const { data: portfolio } = usePortfolio()
 
@@ -268,7 +268,7 @@ onBeforeUnmount(() => {
           <img
             :src="logo"
             alt="HK Dev"
-            height="42"
+            height="62"
           />
         </a>
       </q-toolbar-title>
