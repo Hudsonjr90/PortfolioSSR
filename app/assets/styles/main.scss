@@ -4,10 +4,20 @@ html {
   scroll-behavior: smooth;
 }
 
+:root {
+  --portfolio-background: #080b12;
+  --portfolio-text: #dcdddd;
+}
+
+body.body--light {
+  --portfolio-background: #f8fafc;
+  --portfolio-text: #172033;
+}
+
 body {
   margin: 0;
-  background-color: $dark;
-  color: $light;
+  background-color: var(--portfolio-background);
+  color: var(--portfolio-text);
   font-family:
     Poppins,
     -apple-system,
@@ -26,4 +36,8 @@ body {
 
 .text-grey-6 {
   color: #94a3b8 !important;
+}
+
+body.body--light .text-grey-6 {
+  color: #64748b !important;
 }

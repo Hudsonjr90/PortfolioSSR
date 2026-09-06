@@ -658,7 +658,7 @@ onBeforeUnmount(() => {
       @hide="closeTestimonial"
     >
       <q-card
-        class="testimonial-dialog bg-transparent backdrop-blur"
+        class="testimonial-dialog"
       >
         <q-btn
           round
