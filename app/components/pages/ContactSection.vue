@@ -5,6 +5,7 @@ import {
   onBeforeUnmount,
   onMounted,
   ref,
+  watch,
 } from 'vue'
 
 import type {
@@ -22,6 +23,7 @@ import {
 
 const { data: portfolio } = usePortfolio()
 const { isMobile } = useMobile()
+const { isDark } = useTheme()
 
 const config = useRuntimeConfig()
 
@@ -32,6 +34,13 @@ const mapError = ref(false)
 
 let map: LeafletMap | null = null
 let neighborhoodLayer: LeafletGeoJSON | null = null
+let tileLayer: import('leaflet').TileLayer | null = null
+
+function getTileUrl() {
+  const style = isDark.value ? 'dark_all' : 'light_all'
+
+  return `https://{s}.basemaps.cartocdn.com/rastertiles/${style}/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(String(config.public.cartoApiKey ?? '').trim())}`
+}
 
 const email = computed(() => {
   return portfolio.value?.profile?.email ?? ''
@@ -299,8 +308,8 @@ async function initializeMap() {
       attributionControl: true,
     })
 
-    L.tileLayer(
-      `https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(apiKey)}`,
+    tileLayer = L.tileLayer(
+      getTileUrl(),
       {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
@@ -362,9 +371,29 @@ onMounted(() => {
   initializeMap()
 })
 
+watch(
+  isDark,
+  async () => {
+    if (!map) {
+      return
+    }
+
+    const L = await import('leaflet')
+
+    tileLayer?.remove()
+    tileLayer = L.tileLayer(getTileUrl(), {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20,
+    }).addTo(map)
+  },
+)
+
 onBeforeUnmount(() => {
   neighborhoodLayer = null
 
+  tileLayer?.remove()
   map?.remove()
   map = null
 })
@@ -736,6 +765,17 @@ onBeforeUnmount(() => {
   text-align: center;
   padding: 24px;
   background: #070b14;
+}
+
+:global(body.body--light) .contact-map :deep(.leaflet-container),
+:global(body.body--light) .map-state {
+  background: #f8fafc;
+  color: #172033;
+}
+
+:global(body.body--light) .contact-map :deep(.neighborhood-label) {
+  background: rgba(255, 255, 255, 0.9);
+  color: #172033;
 }
 
 @media (max-width: 599px) {

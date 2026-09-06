@@ -10,8 +10,23 @@ import {
 import logo from '~/assets/images/logo.png'
 
 const { data: portfolio } = usePortfolio()
+const { isDark, isReady: isThemeReady, toggleTheme } = useTheme()
 
 const activeSection = ref<string | null>(null)
+
+const themeIcon = computed(() => {
+  if (!isThemeReady.value || isDark.value) {
+    return 'mdi-weather-sunny'
+  }
+
+  return 'mdi-weather-night'
+})
+
+const themeLabel = computed(() => {
+  return isDark.value
+    ? 'Ativar tema claro'
+    : 'Ativar tema escuro'
+})
 
 const sections = [
   {
@@ -86,22 +101,12 @@ function getSectionElement(id: string) {
   return document.getElementById(id)
 }
 
-/**
- * Retorna a altura atual do header.
- */
 function getHeaderHeight() {
   const header = document.querySelector('.q-header') as HTMLElement | null
 
   return header?.offsetHeight ?? 72
 }
 
-/**
- * Atualiza a seção ativa com base na posição real
- * das seções dentro da viewport.
- *
- * A região considerada para ativação fica logo abaixo
- * do navbar, evitando trocar a seção cedo demais.
- */
 function updateActiveSection() {
   const headerHeight = getHeaderHeight()
 
@@ -125,14 +130,6 @@ function updateActiveSection() {
     }
   }
 
-  /**
-   * Quando chegamos ao final absoluto da página,
-   * força Contato como seção ativa.
-   *
-   * Isso resolve especialmente o caso em que a última
-   * seção não consegue ultrapassar a linha de ativação
-   * por causa do limite máximo do scroll.
-   */
   const documentHeight = document.documentElement.scrollHeight
   const viewportBottom = window.scrollY + window.innerHeight
 
@@ -228,10 +225,6 @@ onMounted(async () => {
     },
   )
 
-  /**
-   * Pequeno atraso para garantir que todas as seções
-   * já tenham sido renderizadas e possuam suas alturas.
-   */
   requestAnimationFrame(() => {
     updateActiveSection()
   })
@@ -254,7 +247,7 @@ onBeforeUnmount(() => {
   <q-header
     bordered
     height-hint="50"
-    class="bg-transparent backdrop-blur"
+    :class="isDark ? 'bg-transparent backdrop-blur' : 'bg-primary'"
   >
     <q-toolbar class="wrapper q-px-md">
       <!-- Logo -->
@@ -279,8 +272,8 @@ onBeforeUnmount(() => {
       <q-tabs
         v-model="activeSection"
         class="gt-sm"
-        active-color="primary"
-        indicator-color="primary"
+        :active-color="isDark ? 'primary' : 'dark'"
+        :indicator-color="isDark ? 'primary' : 'dark'"
         narrow-indicator
         shrink
         align="center"
@@ -292,6 +285,7 @@ onBeforeUnmount(() => {
           :label="section.label"
           no-caps
           @click="scrollToSection(section.id)"
+          :color="isDark ? 'primary' : 'secondary'"
         />
       </q-tabs>
 
@@ -331,9 +325,29 @@ onBeforeUnmount(() => {
           target="_blank"
           rel="noopener noreferrer"
         />
+
+      <!-- <q-btn
+        flat
+        round
+        :icon="themeIcon"
+        :aria-label="themeLabel"
+        :title="themeLabel"
+        @click="toggleTheme"
+      /> -->
+
       </div>
 
       <!-- Menu mobile -->
+      <!-- <q-btn
+        flat
+        round
+        :icon="themeIcon"
+        class="lt-md"
+        :aria-label="themeLabel"
+        :title="themeLabel"
+        @click="toggleTheme"
+      /> -->
+
       <q-btn
         flat
         round

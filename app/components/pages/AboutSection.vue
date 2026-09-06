@@ -54,7 +54,7 @@ const principles = [
             {{ portfolio.profile.headline }}
           </div>
 
-          <div class="text-body1 text-white q-mb-xl">
+          <div class="text-body1 q-mb-xl">
             {{ portfolio.profile.shortBio }}
           </div>
 
