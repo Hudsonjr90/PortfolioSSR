@@ -102,9 +102,11 @@ useSeoMeta({
 
   ogImage,
 
-  ogImageWidth: '1200',
+  ogImageWidth: '500',
 
-  ogImageHeight: '630',
+  ogImageHeight: '500',
+
+  ogImageType: 'image/png',
 
   ogImageAlt: 'Hudson Kennedy - Desenvolvedor Full Stack',
 
