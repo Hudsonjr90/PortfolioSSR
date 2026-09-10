@@ -70,10 +70,9 @@
 </template>
 
 <script setup lang="ts">
-const requestUrl = useRequestURL()
 const isDark = useTheme().isDark
 
-const siteUrl = requestUrl.origin
+const siteUrl = 'https://www.hudsonkennedy.dev.br'
 const canonicalUrl = `${siteUrl}/`
 
 const title = 'Hudson Kennedy | Desenvolvedor Full Stack'
@@ -102,9 +101,9 @@ useSeoMeta({
 
   ogImage,
 
-  ogImageWidth: '300',
+  ogImageWidth: '1200',
 
-  ogImageHeight: '300',
+  ogImageHeight: '630',
 
   ogImageType: 'image/png',
 
