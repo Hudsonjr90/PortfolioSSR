@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
       round
       unelevated
       color="primary"
-      icon="mdi-arrow-up"
+      icon="mdi-arrow-up-bold-outline"
       aria-label="Voltar ao topo"
       class="scroll-top-button"
       @click="scrollToTop"
@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
 .scroll-top-button {
   position: fixed;
   right: 28px;
-  bottom: 88px;
+  bottom: 125px;
   z-index: 2000;
   width: 48px;
   height: 48px;
@@ -116,10 +116,10 @@ onBeforeUnmount(() => {
   transform: translateY(10px);
 }
 
-@media (max-width: 599px) {
+@media (max-width: 768px) {
   .scroll-top-button {
     right: 18px;
-    bottom: 18px;
+    bottom: 66px;
     width: 44px;
     height: 44px;
   }
