@@ -102,9 +102,9 @@ useSeoMeta({
 
   ogImage,
 
-  ogImageWidth: '500',
+  ogImageWidth: '300',
 
-  ogImageHeight: '500',
+  ogImageHeight: '300',
 
   ogImageType: 'image/png',
 
