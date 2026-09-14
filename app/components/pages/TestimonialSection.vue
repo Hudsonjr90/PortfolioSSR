@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 interface TestimonialItem {
   id: string
@@ -23,8 +16,7 @@ const { isMobile } = useMobile()
 
 const currentSlide = ref(0)
 
-const selectedTestimonial =
-  ref<TestimonialItem | null>(null)
+const selectedTestimonial = ref<TestimonialItem | null>(null)
 
 const dialogVisible = ref(false)
 
@@ -32,33 +24,20 @@ const isHovered = ref(false)
 
 const isMobileModel = ref(false)
 
-const overflowingTestimonials =
-  ref<Record<string, boolean>>({})
+const overflowingTestimonials = ref<Record<string, boolean>>({})
 
-const testimonialTextRefs =
-  new Map<string, HTMLElement>()
+const testimonialTextRefs = new Map<string, HTMLElement>()
 
-let autoplayTimer: ReturnType<
-  typeof setInterval
-> | null = null
+let autoplayTimer: ReturnType<typeof setInterval> | null = null
 
 let resizeObserver: ResizeObserver | null = null
 
-const testimonials = computed<TestimonialItem[]>(
-  () => {
-    const items =
-      portfolio.value?.experiences?.flatMap(
-        (experience) =>
-          experience.testimonials ?? [],
-      ) ?? []
+const testimonials = computed<TestimonialItem[]>(() => {
+  const items =
+    portfolio.value?.experiences?.flatMap((experience) => experience.testimonials ?? []) ?? []
 
-    return [...items].sort(
-      (a, b) =>
-        (a.sortOrder ?? 0) -
-        (b.sortOrder ?? 0),
-    )
-  },
-)
+  return [...items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+})
 
 const cardsPerSlide = computed(() => {
   return isMobile.value ? 1 : 3
@@ -67,17 +46,8 @@ const cardsPerSlide = computed(() => {
 const testimonialSlides = computed(() => {
   const slides: TestimonialItem[][] = []
 
-  for (
-    let index = 0;
-    index < testimonials.value.length;
-    index += cardsPerSlide.value
-  ) {
-    slides.push(
-      testimonials.value.slice(
-        index,
-        index + cardsPerSlide.value,
-      ),
-    )
+  for (let index = 0; index < testimonials.value.length; index += cardsPerSlide.value) {
+    slides.push(testimonials.value.slice(index, index + cardsPerSlide.value))
   }
 
   return slides
@@ -88,29 +58,18 @@ const totalSlides = computed(() => {
 })
 
 function updateViewport() {
-  const previousMobileState =
-    isMobileModel.value
+  const previousMobileState = isMobileModel.value
 
-  isMobileModel.value =
-    window.innerWidth < 768
+  isMobileModel.value = window.innerWidth < 768
 
-  if (
-    previousMobileState !==
-    isMobileModel.value
-  ) {
+  if (previousMobileState !== isMobileModel.value) {
     currentSlide.value = 0
   }
 }
 
-function setTestimonialTextRef(
-  id: string,
-  element: unknown,
-) {
+function setTestimonialTextRef(id: string, element: unknown) {
   if (element instanceof HTMLElement) {
-    testimonialTextRefs.set(
-      id,
-      element,
-    )
+    testimonialTextRefs.set(id, element)
 
     return
   }
@@ -121,66 +80,43 @@ function setTestimonialTextRef(
 async function detectTextOverflow() {
   await nextTick()
 
-  const result: Record<
-    string,
-    boolean
-  > = {}
+  const result: Record<string, boolean> = {}
 
-  testimonials.value.forEach(
-    (testimonial) => {
-      const element =
-        testimonialTextRefs.get(
-          testimonial.id,
-        )
+  testimonials.value.forEach((testimonial) => {
+    const element = testimonialTextRefs.get(testimonial.id)
 
-      if (!element) {
-        return
-      }
+    if (!element) {
+      return
+    }
 
-      result[testimonial.id] =
-        element.scrollHeight >
-        element.clientHeight + 1
-    },
-  )
+    result[testimonial.id] = element.scrollHeight > element.clientHeight + 1
+  })
 
-  overflowingTestimonials.value =
-    result
+  overflowingTestimonials.value = result
 }
 
-function isTestimonialOverflowing(
-  id: string,
-) {
-  return (
-    overflowingTestimonials.value[id] ??
-    false
-  )
+function isTestimonialOverflowing(id: string) {
+  return overflowingTestimonials.value[id] ?? false
 }
 
-function getImageFileName(
-  avatarUrl: string | null,
-) {
+function getImageFileName(avatarUrl: string | null) {
   if (!avatarUrl) {
     return null
   }
 
-  const cleanUrl =
-    avatarUrl.split('?')[0]
+  const cleanUrl = avatarUrl.split('?')[0]
 
   if (!cleanUrl) {
     return null
   }
 
-  const fileName =
-    cleanUrl.split('/').pop()
+  const fileName = cleanUrl.split('/').pop()
 
   return fileName || null
 }
 
-function getTestimonialAvatar(
-  avatarUrl: string | null,
-) {
-  const fileName =
-    getImageFileName(avatarUrl)
+function getTestimonialAvatar(avatarUrl: string | null) {
+  const fileName = getImageFileName(avatarUrl)
 
   if (!fileName) {
     return null
@@ -194,20 +130,14 @@ function getInitials(name: string) {
     .trim()
     .split(/\s+/)
     .slice(0, 2)
-    .map(
-      (part) =>
-        part.charAt(0).toUpperCase(),
-    )
+    .map((part) => part.charAt(0).toUpperCase())
     .join('')
 }
 
-function openTestimonial(
-  testimonial: TestimonialItem,
-) {
+function openTestimonial(testimonial: TestimonialItem) {
   stopAutoplay()
 
-  selectedTestimonial.value =
-    testimonial
+  selectedTestimonial.value = testimonial
 
   dialogVisible.value = true
 }
@@ -237,17 +167,11 @@ function startAutoplay() {
   }
 
   autoplayTimer = setInterval(() => {
-    if (
-      dialogVisible.value ||
-      isHovered.value ||
-      totalSlides.value <= 1
-    ) {
+    if (dialogVisible.value || isHovered.value || totalSlides.value <= 1) {
       return
     }
 
-    currentSlide.value =
-      (currentSlide.value + 1) %
-      totalSlides.value
+    currentSlide.value = (currentSlide.value + 1) % totalSlides.value
 
     detectTextOverflow()
   }, 5000)
@@ -273,27 +197,20 @@ function resumeCarousel() {
   startAutoplay()
 }
 
-function handleSlideChange(
-  slide: string | number,
-) {
+function handleSlideChange(slide: string | number) {
   currentSlide.value = Number(slide)
 
   detectTextOverflow()
 }
 
 async function goToPreviousSlide() {
-  currentSlide.value =
-    currentSlide.value === 0
-      ? totalSlides.value - 1
-      : currentSlide.value - 1
+  currentSlide.value = currentSlide.value === 0 ? totalSlides.value - 1 : currentSlide.value - 1
 
   await detectTextOverflow()
 }
 
 async function goToNextSlide() {
-  currentSlide.value =
-    (currentSlide.value + 1) %
-    totalSlides.value
+  currentSlide.value = (currentSlide.value + 1) % totalSlides.value
 
   await detectTextOverflow()
 }
@@ -311,14 +228,11 @@ watch(
   },
 )
 
-watch(
-  testimonials,
-  async () => {
-    await nextTick()
+watch(testimonials, async () => {
+  await nextTick()
 
-    await detectTextOverflow()
-  },
-)
+  await detectTextOverflow()
+})
 
 watch(
   () => dialogVisible.value,
@@ -337,25 +251,19 @@ watch(
 onMounted(async () => {
   updateViewport()
 
-  window.addEventListener(
-    'resize',
-    updateViewport,
-  )
+  window.addEventListener('resize', updateViewport)
 
   await nextTick()
 
   await detectTextOverflow()
 
-  resizeObserver =
-    new ResizeObserver(() => {
-      detectTextOverflow()
-    })
+  resizeObserver = new ResizeObserver(() => {
+    detectTextOverflow()
+  })
 
-  testimonialTextRefs.forEach(
-    (element) => {
-      resizeObserver?.observe(element)
-    },
-  )
+  testimonialTextRefs.forEach((element) => {
+    resizeObserver?.observe(element)
+  })
 
   startAutoplay()
 })
@@ -363,10 +271,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   stopAutoplay()
 
-  window.removeEventListener(
-    'resize',
-    updateViewport,
-  )
+  window.removeEventListener('resize', updateViewport)
 
   resizeObserver?.disconnect()
   resizeObserver = null
@@ -376,32 +281,20 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section
-    id="depoimentos"
-    class="q-py-xl"
-  >
+  <section id="depoimentos" class="q-py-xl">
     <div class="wrapper">
       <!-- Cabeçalho -->
-      <div
-        class="testimonial-heading q-mb-xl"
-      >
-        <div
-          class="text-overline text-primary text-weight-bold"
-        >
-          Depoimentos
-        </div>
+      <div class="testimonial-heading q-mb-xl">
+        <div class="text-overline text-primary text-weight-bold">Depoimentos</div>
 
         <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
           O que dizem sobre meu trabalho
         </div>
 
         <div class="text-body1 q-mt-md">
-          Ao longo da minha trajetória
-          profissional, tive a oportunidade
-          de trabalhar com diferentes equipes,
-          projetos e desafios. Confira alguns
-          depoimentos de pessoas com quem
-          compartilhei essa jornada.
+          Ao longo da minha trajetória profissional, tive a oportunidade de trabalhar com diferentes
+          equipes, projetos e desafios. Confira alguns depoimentos de pessoas com quem compartilhei
+          essa jornada.
         </div>
       </div>
 
@@ -421,21 +314,15 @@ onBeforeUnmount(() => {
           control-color="primary"
           transition-prev="slide-right"
           transition-next="slide-left"
-          @update:model-value="
-            handleSlideChange
-          "
+          @update:model-value="handleSlideChange"
         >
           <q-carousel-slide
-            v-for="(
-              slide, slideIndex
-            ) in testimonialSlides"
+            v-for="(slide, slideIndex) in testimonialSlides"
             :key="slideIndex"
             :name="slideIndex"
             class="testimonial-slide"
           >
-            <div
-              class="testimonial-grid"
-            >
+            <div class="testimonial-grid">
               <q-card
                 v-for="testimonial in slide"
                 :key="testimonial.id"
@@ -443,41 +330,20 @@ onBeforeUnmount(() => {
                 bordered
                 clickable
                 class="testimonial-card bg-transparent"
-                @click="
-                  openTestimonial(
-                    testimonial,
-                  )
-                "
+                @click="openTestimonial(testimonial)"
               >
-                <q-card-section
-                  class="testimonial-card-content"
-                >
+                <q-card-section class="testimonial-card-content">
                   <!-- Citação -->
-                  <div
-                    class="testimonial-quote"
-                  >
-                    <q-icon
-                      name="mdi-format-quote-open"
-                      size="34px"
-                      color="primary"
-                    />
+                  <div class="testimonial-quote">
+                    <q-icon name="mdi-format-quote-open" size="34px" color="primary" />
                   </div>
 
                   <!-- Conteúdo -->
                   <div
-                    :ref="
-                      (element) =>
-                        setTestimonialTextRef(
-                          testimonial.id,
-                          element,
-                        )
-                    "
+                    :ref="(element) => setTestimonialTextRef(testimonial.id, element)"
                     class="testimonial-content text-body1"
                     :class="{
-                      'testimonial-content-truncated':
-                        isTestimonialOverflowing(
-                          testimonial.id,
-                        ),
+                      'testimonial-content-truncated': isTestimonialOverflowing(testimonial.id),
                     }"
                   >
                     {{ testimonial.content }}
@@ -485,79 +351,38 @@ onBeforeUnmount(() => {
 
                   <!-- Ler depoimento -->
                   <div
-                    v-if="
-                      isTestimonialOverflowing(
-                        testimonial.id,
-                      )
-                    "
+                    v-if="isTestimonialOverflowing(testimonial.id)"
                     class="testimonial-read-more"
                   >
-                    <span>
-                      Ler depoimento
-                    </span>
+                    <span> Ler depoimento </span>
 
-                    <q-icon
-                      name="mdi-arrow-right"
-                      size="18px"
-                    />
+                    <q-icon name="mdi-arrow-right" size="18px" />
                   </div>
 
                   <!-- Autor -->
-                  <div
-                    class="testimonial-author"
-                  >
-                    <q-avatar
-                      size="52px"
-                      class="testimonial-avatar"
-                    >
+                  <div class="testimonial-author">
+                    <q-avatar size="52px" class="testimonial-avatar">
                       <img
-                        v-if="
-                          getTestimonialAvatar(
-                            testimonial.avatarUrl,
-                          )
-                        "
-                        :src="
-                          getTestimonialAvatar(
-                            testimonial.avatarUrl,
-                          ) ?? undefined
-                        "
-                        :alt="
-                          `Foto de ${testimonial.name}`
-                        "
+                        v-if="getTestimonialAvatar(testimonial.avatarUrl)"
+                        :src="getTestimonialAvatar(testimonial.avatarUrl) ?? undefined"
+                        :alt="`Foto de ${testimonial.name}`"
                       />
 
-                      <span
-                        v-else
-                        class="testimonial-initials"
-                      >
-                        {{
-                          getInitials(
-                            testimonial.name,
-                          )
-                        }}
+                      <span v-else class="testimonial-initials">
+                        {{ getInitials(testimonial.name) }}
                       </span>
                     </q-avatar>
 
-                    <div
-                      class="testimonial-author-info"
-                    >
-                      <div
-                        class="text-body1 text-weight-bold"
-                      >
-                        {{
-                          testimonial.name
-                        }}
+                    <div class="testimonial-author-info">
+                      <div class="text-body1 text-weight-bold">
+                        {{ testimonial.name }}
                       </div>
 
                       <div
-                        v-if="
-                          testimonial.company
-                        "
+                        v-if="testimonial.company"
                         class="text-caption text-primary text-weight-medium"
                       >
-                        {{
-                          testimonial.company
-                        }}
+                        {{ testimonial.company }}
                       </div>
                     </div>
                   </div>
@@ -568,98 +393,58 @@ onBeforeUnmount(() => {
 
           <!-- Setas -->
           <template #control v-if="!isMobile">
-            <q-carousel-control
-              position="top-left"
-              :offset="[0, 180]"
-            >
+            <q-carousel-control position="top-left" :offset="[0, 180]">
               <q-btn
                 round
                 flat
                 class="bg-primary"
                 icon="mdi-chevron-left"
                 aria-label="Depoimento anterior"
-                @click="
-                  goToPreviousSlide()
-                "
+                @click="goToPreviousSlide()"
               />
             </q-carousel-control>
 
-            <q-carousel-control
-              position="top-right"
-              :offset="[0, 180]"
-            >
+            <q-carousel-control position="top-right" :offset="[0, 180]">
               <q-btn
                 round
                 flat
                 class="bg-primary"
                 icon="mdi-chevron-right"
                 aria-label="Próximo depoimento"
-                @click="
-                  goToNextSlide()
-                "
+                @click="goToNextSlide()"
               />
             </q-carousel-control>
           </template>
         </q-carousel>
 
         <!-- Indicadores -->
-        <div
-          v-if="totalSlides > 1"
-          class="testimonial-indicators"
-        >
+        <div v-if="totalSlides > 1" class="testimonial-indicators">
           <button
-            v-for="(
-              _, index
-            ) in testimonialSlides"
+            v-for="(_, index) in testimonialSlides"
             :key="index"
             type="button"
             class="testimonial-indicator"
             :class="{
-              'testimonial-indicator-active':
-                currentSlide === index,
+              'testimonial-indicator-active': currentSlide === index,
             }"
-            :aria-label="
-              `Ir para depoimentos ${index + 1}`
-            "
-            :aria-current="
-              currentSlide === index
-                ? 'true'
-                : undefined
-            "
-            @click="
-              currentSlide = index
-            "
+            :aria-label="`Ir para depoimentos ${index + 1}`"
+            :aria-current="currentSlide === index ? 'true' : undefined"
+            @click="currentSlide = index"
           />
         </div>
       </div>
 
       <!-- Estado vazio -->
-      <div
-        v-else
-        class="testimonial-empty"
-      >
-        <q-icon
-          name="mdi-comment-quote-outline"
-          size="48px"
-          color="primary"
-        />
+      <div v-else class="testimonial-empty">
+        <q-icon name="mdi-comment-quote-outline" size="48px" color="primary" />
 
-        <div
-          class="text-body1 q-mt-md"
-        >
-          Nenhum depoimento disponível.
-        </div>
+        <div class="text-body1 q-mt-md">Nenhum depoimento disponível.</div>
       </div>
     </div>
 
     <!-- Dialog -->
-    <q-dialog
-      v-model="dialogVisible"
-      @hide="closeTestimonial"
-    >
-      <q-card
-        class="testimonial-dialog"
-      >
+    <q-dialog v-model="dialogVisible" @hide="closeTestimonial">
+      <q-card class="testimonial-dialog">
         <q-btn
           round
           flat
@@ -671,87 +456,42 @@ onBeforeUnmount(() => {
           v-close-popup
         />
 
-        <q-card-section
-          v-if="selectedTestimonial"
-          class="testimonial-dialog-content"
-        >
+        <q-card-section v-if="selectedTestimonial" class="testimonial-dialog-content">
           <!-- Autor -->
-          <div
-            class="testimonial-dialog-author"
-          >
-            <q-avatar
-              size="76px"
-              class="testimonial-avatar"
-            >
+          <div class="testimonial-dialog-author">
+            <q-avatar size="76px" class="testimonial-avatar">
               <img
-                v-if="
-                  getTestimonialAvatar(
-                    selectedTestimonial.avatarUrl,
-                  )
-                "
-                :src="
-                  getTestimonialAvatar(
-                    selectedTestimonial.avatarUrl,
-                  ) ?? undefined
-                "
-                :alt="
-                  `Foto de ${selectedTestimonial.name}`
-                "
+                v-if="getTestimonialAvatar(selectedTestimonial.avatarUrl)"
+                :src="getTestimonialAvatar(selectedTestimonial.avatarUrl) ?? undefined"
+                :alt="`Foto de ${selectedTestimonial.name}`"
               />
 
-              <span
-                v-else
-                class="testimonial-initials"
-              >
-                {{
-                  getInitials(
-                    selectedTestimonial.name,
-                  )
-                }}
+              <span v-else class="testimonial-initials">
+                {{ getInitials(selectedTestimonial.name) }}
               </span>
             </q-avatar>
 
-            <div
-              class="testimonial-dialog-author-info"
-            >
-              <div
-                class="text-h6 text-weight-bold"
-              >
-                {{
-                  selectedTestimonial.name
-                }}
+            <div class="testimonial-dialog-author-info">
+              <div class="text-h6 text-weight-bold">
+                {{ selectedTestimonial.name }}
               </div>
 
               <div
-                v-if="
-                  selectedTestimonial.company
-                "
+                v-if="selectedTestimonial.company"
                 class="text-body2 text-primary text-weight-medium"
               >
-                {{
-                  selectedTestimonial.company
-                }}
+                {{ selectedTestimonial.company }}
               </div>
             </div>
           </div>
 
           <!-- Conteúdo completo -->
-          <div
-            class="testimonial-dialog-quote q-mt-xl"
-          >
-            <q-icon
-              name="mdi-format-quote-open"
-              size="42px"
-              color="primary"
-            />
+          <div class="testimonial-dialog-quote q-mt-xl">
+            <q-icon name="mdi-format-quote-open" size="42px" color="primary" />
           </div>
 
-          <div
-            class="testimonial-dialog-text q-mt-sm"
-          >
-            {{
-              selectedTestimonial.content
-            }}
+          <div class="testimonial-dialog-text q-mt-sm">
+            {{ selectedTestimonial.content }}
           </div>
         </q-card-section>
       </q-card>
@@ -779,12 +519,8 @@ onBeforeUnmount(() => {
 
 .testimonial-grid {
   display: grid;
-  grid-template-columns: repeat(
-    3,
-    minmax(0, 1fr)
-  );
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-
 }
 
 .testimonial-card {
@@ -801,12 +537,7 @@ onBeforeUnmount(() => {
 
 .testimonial-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(
-    0,
-    212,
-    255,
-    0.5
-  );
+  border-color: rgba(0, 212, 255, 0.5);
 }
 
 .testimonial-card-content {
@@ -858,12 +589,7 @@ onBeforeUnmount(() => {
 .testimonial-avatar {
   flex-shrink: 0;
   overflow: hidden;
-  background: rgba(
-    0,
-    212,
-    255,
-    0.12
-  );
+  background: rgba(0, 212, 255, 0.12);
 }
 
 .testimonial-avatar img {
@@ -887,8 +613,7 @@ onBeforeUnmount(() => {
   min-width: 0;
 }
 
-.testimonial-author-info
-  .text-body1 {
+.testimonial-author-info .text-body1 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -935,10 +660,7 @@ onBeforeUnmount(() => {
 
 .testimonial-dialog {
   position: relative;
-  width: min(
-    720px,
-    calc(100vw - 32px)
-  );
+  width: min(720px, calc(100vw - 32px));
   max-width: 720px;
   border-radius: 20px;
   overflow: hidden;

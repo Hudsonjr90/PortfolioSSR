@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 import profileImage from '~/assets/images/profile/my.webp'
 
 const { data: portfolio, pending, error } = usePortfolio()
@@ -8,6 +8,86 @@ const { isMobile } = useMobile()
 
 const activePrinciple = ref('0')
 const isAboutExpanded = ref(false)
+const pixelCanvas = ref<HTMLCanvasElement | null>(null)
+
+let pixelEffectImage: HTMLImageElement | null = null
+
+function getPixelEffectImage() {
+  if (pixelEffectImage) return pixelEffectImage
+
+  pixelEffectImage = new Image()
+  pixelEffectImage.src = profileImage
+  return pixelEffectImage
+}
+
+function drawPixelEffect() {
+  const canvas = pixelCanvas.value
+  if (!canvas) return
+
+  const size = canvas.clientWidth
+  if (!size) return
+
+  const image = getPixelEffectImage()
+  if (!image.complete) {
+    image.addEventListener('load', drawPixelEffect, { once: true })
+    return
+  }
+
+  const pixelRatio = window.devicePixelRatio || 1
+  const gridSize = 52
+  const pixelSize = size / gridSize
+  const sourceSize = Math.min(image.naturalWidth, image.naturalHeight)
+  const sourceX = (image.naturalWidth - sourceSize) / 2
+  const sourceY = (image.naturalHeight - sourceSize) / 2
+  const buffer = document.createElement('canvas')
+  const bufferContext = buffer.getContext('2d', { willReadFrequently: true })
+  const context = canvas.getContext('2d')
+
+  if (!bufferContext || !context) return
+
+  canvas.width = Math.round(size * pixelRatio)
+  canvas.height = Math.round(size * pixelRatio)
+  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+
+  buffer.width = gridSize
+  buffer.height = gridSize
+  bufferContext.imageSmoothingEnabled = false
+  bufferContext.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceSize,
+    sourceSize,
+    0,
+    0,
+    gridSize,
+    gridSize,
+  )
+
+  const pixels = bufferContext.getImageData(0, 0, gridSize, gridSize).data
+  context.fillStyle = '#050505'
+  context.fillRect(0, 0, size, size)
+
+  for (let y = 0; y < gridSize; y += 1) {
+    for (let x = 0; x < gridSize; x += 1) {
+      const noise = Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1
+      if (noise < 0.22) continue
+
+      const index = (y * gridSize + x) * 4
+      context.fillStyle = `rgb(${pixels[index]}, ${pixels[index + 1]}, ${pixels[index + 2]})`
+      context.fillRect(x * pixelSize + 0.75, y * pixelSize + 0.75, pixelSize - 1.5, pixelSize - 1.5)
+    }
+  }
+}
+
+function clearPixelEffect() {
+  const canvas = pixelCanvas.value
+  const context = canvas?.getContext('2d')
+
+  if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height)
+}
+
+onBeforeUnmount(clearPixelEffect)
 
 const principles = [
   {
@@ -155,16 +235,20 @@ const principles = [
                 <span class="electric-spark electric-spark--6"></span>
               </div>
 
-              <q-avatar
-                :size="isMobile ? '200px' : '280px'"
+              <div
                 class="profile-avatar__image shadow-10"
+                @mouseenter="drawPixelEffect"
+                @mouseleave="clearPixelEffect"
               >
                 <img
+                  class="profile-avatar__image-base"
                   :src="profileImage"
                   :alt="`${portfolio.profile.name} - ${portfolio.profile.headline}`"
                   loading="eager"
                 />
-              </q-avatar>
+
+                <canvas ref="pixelCanvas" class="profile-avatar__pixelated" aria-hidden="true"></canvas>
+              </div>
             </div>
           </div>
         </div>
@@ -420,9 +504,37 @@ const principles = [
 .profile-avatar__image {
   position: relative;
   z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
   transition:
     transform 0.4s ease,
     box-shadow 0.4s ease;
+}
+
+.profile-avatar__image-base {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+
+.profile-avatar__pixelated {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.profile-avatar__pixelated {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* =========================================================
@@ -605,6 +717,14 @@ const principles = [
   box-shadow:
     0 0 15px rgba(0, 174, 239, 0.45),
     0 0 35px rgba(0, 174, 239, 0.25);
+}
+
+.profile-avatar:hover .profile-avatar__image-base {
+  opacity: 0.08;
+}
+
+.profile-avatar:hover .profile-avatar__pixelated {
+  opacity: 1;
 }
 
 .profile-avatar:hover .electric-spark {

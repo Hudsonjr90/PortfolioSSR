@@ -573,4 +573,13 @@ watch(
   }
 }
 
+@media screen and (max-width: 430px) {
+  .category-select {
+    min-width: 163px;
+  }
+  .level-select {
+    min-width: 163px;
+  }
+}
+
 </style>
