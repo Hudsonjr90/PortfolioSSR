@@ -5,6 +5,7 @@ import profileImage from '~/assets/images/profile/my.webp'
 const { data: portfolio, pending, error } = usePortfolio()
 
 const { isMobile } = useMobile()
+const { isDark } = useTheme()
 
 const activePrinciple = ref('0')
 const isAboutExpanded = ref(false)
@@ -291,7 +292,8 @@ const principles = [
               :key="principle.title"
               flat
               bordered
-              class="principle-card bg-primary"
+              class="principle-card"
+              :class="isDark ? 'bg-transparent backdrop-blur' : 'bg-primary'"
             >
               <q-card-section class="principle-card__content">
                 <q-avatar

@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 const { data: portfolio } = usePortfolio()
 
 const { pageSize, isMobile } = useMobile()
+const { isDark } = useTheme()
 
 const totalPages = computed(() =>
   Math.max(
@@ -369,7 +370,7 @@ watch(totalPages, (pages) => {
           <q-card
             flat
             bordered
-            class="education-card full-height bg-transparent"
+            class="education-card full-height bg-transparent backdrop-blur"
           >
             <!-- Imagem -->
             <button

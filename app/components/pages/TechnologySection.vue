@@ -402,7 +402,7 @@ watch(
           <q-card
             flat
             bordered
-            class="technology-card full-height bg-transparent"
+            class="technology-card full-height bg-transparent backdrop-blur"
           >
             <q-card-section class="technology-card-content">
               <!-- Ícone -->

@@ -327,7 +327,7 @@ onBeforeUnmount(() => {
       <div class="row q-col-gutter-lg">
         <!-- Canais -->
         <div class="col-12 col-md-5">
-          <q-card flat bordered class="contact-card full-height bg-transparent">
+          <q-card flat bordered class="contact-card full-height bg-transparent backdrop-blur">
             <q-card-section class="q-pa-lg">
               <div class="text-h6 text-weight-bold">Canais</div>
 
@@ -373,7 +373,7 @@ onBeforeUnmount(() => {
 
         <!-- Localização -->
         <div class="col-12 col-md-7">
-          <q-card flat bordered class="contact-map-card full-height bg-transparent">
+          <q-card flat bordered class="contact-map-card full-height bg-transparent backdrop-blur">
             <q-card-section class="q-pa-lg q-pb-md">
               <div class="text-h6 text-weight-bold">
                 Localização

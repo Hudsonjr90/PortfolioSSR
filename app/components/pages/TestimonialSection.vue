@@ -329,7 +329,7 @@ onBeforeUnmount(() => {
                 flat
                 bordered
                 clickable
-                class="testimonial-card bg-transparent"
+                class="testimonial-card bg-transparent backdrop-blur"
                 @click="openTestimonial(testimonial)"
               >
                 <q-card-section class="testimonial-card-content">
