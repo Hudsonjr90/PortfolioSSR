@@ -402,7 +402,7 @@ watch(
           <q-card
             flat
             bordered
-            class="technology-card full-height bg-transparent"
+            class="technology-card full-height bg-transparent backdrop-blur"
           >
             <q-card-section class="technology-card-content">
               <!-- Ícone -->
@@ -570,6 +570,15 @@ watch(
   }
   .level-select {
     min-width: 165px;
+  }
+}
+
+@media screen and (max-width: 430px) {
+  .category-select {
+    min-width: 163px;
+  }
+  .level-select {
+    min-width: 163px;
   }
 }
 

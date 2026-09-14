@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 const { data: portfolio } = usePortfolio()
 
 const { pageSize, isMobile } = useMobile()
+const { isDark } = useTheme()
 
 const totalPages = computed(() =>
   Math.max(
@@ -360,15 +361,16 @@ watch(totalPages, (pages) => {
         v-if="paginatedEducation.length"
         class="row q-col-gutter-lg"
       >
-        <div
+        <q-intersection
           v-for="education in paginatedEducation"
           :key="education.id"
-          class="col-12 col-md-6 col-lg-4"
+          transition="scale"
+          class="education-intersection col-12 col-md-6 col-lg-4"
         >
           <q-card
             flat
             bordered
-            class="education-card full-height bg-transparent"
+            class="education-card full-height bg-transparent backdrop-blur"
           >
             <!-- Imagem -->
             <button
@@ -468,7 +470,7 @@ watch(totalPages, (pages) => {
               </a>
             </q-card-actions>
           </q-card>
-        </div>
+        </q-intersection>
       </div>
 
       <!-- Sem formações -->
@@ -552,6 +554,10 @@ watch(totalPages, (pages) => {
     transform 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+.education-intersection {
+  min-height: 100%;
 }
 
 .education-card:hover {
