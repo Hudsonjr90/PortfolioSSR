@@ -101,9 +101,9 @@ useSeoMeta({
 
   ogImage,
 
-  ogImageWidth: '1200',
+  ogImageWidth: '600',
 
-  ogImageHeight: '630',
+  ogImageHeight: '600',
 
   ogImageType: 'image/png',
 
