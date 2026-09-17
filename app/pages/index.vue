@@ -65,7 +65,7 @@ const title = 'Hudson Kennedy | Desenvolvedor Full Stack'
 const description =
   'Desenvolvedor Full Stack especializado em Frontend, Backend, Banco de dados e arquitetura de software.'
 
-const ogImage = `${siteUrl}/og-image.png`
+const ogImage = `${siteUrl}/logo.png`
 
 useSeoMeta({
   title,
