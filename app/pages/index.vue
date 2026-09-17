@@ -63,7 +63,7 @@ const canonicalUrl = `${siteUrl}/`
 const title = 'Hudson Kennedy | Desenvolvedor Full Stack'
 
 const description =
-  'Desenvolvedor Full Stack especializado em Frontend, Backend, Banco de dados e arquitetura de software.'
+  'Desenvolvedor Full Stack com foco em arquitetura de software e banco de dados.'
 
 const ogImage = `${siteUrl}/logo.png`
 
