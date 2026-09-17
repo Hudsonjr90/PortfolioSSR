@@ -307,7 +307,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section id="contato" class="q-py-xl">
+  <section id="contato" class="q-py-md">
     <div class="wrapper">
       <!-- Cabeçalho -->
       <div class="contact-heading q-mb-xl">

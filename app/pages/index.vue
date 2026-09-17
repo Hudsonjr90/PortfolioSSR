@@ -16,46 +16,31 @@
           <AboutSection />
 
           <div class="wrapper q-my-xl">
-            <q-separator
-              color="grey-8"
-              class="q-mb-xs q-mt-xs"
-            />
+            <q-separator color="grey-8" />
           </div>
 
           <EducationSection />
 
           <div class="wrapper q-my-xl">
-            <q-separator
-              color="grey-8"
-              class="q-mb-xs q-mt-xs"
-            />
+            <q-separator color="grey-8" />
           </div>
 
           <ExperienceSection />
 
           <div class="wrapper q-my-xl">
-            <q-separator
-              color="grey-8"
-              class="q-mb-xs q-mt-xs"
-            />
+            <q-separator color="grey-8" />
           </div>
 
           <TestimonialSection />
 
           <div class="wrapper q-my-xl">
-            <q-separator
-              color="grey-8"
-              class="q-mb-xs q-mt-xs"
-            />
+            <q-separator color="grey-8" />
           </div>
 
           <TechnologySection />
 
           <div class="wrapper q-my-xl">
-            <q-separator
-              color="grey-8"
-              class="q-mb-xs q-mt-xs"
-            />
+            <q-separator color="grey-8" />
           </div>
 
           <ContactSection class="contact-separation" />
@@ -101,9 +86,9 @@ useSeoMeta({
 
   ogImage,
 
-  ogImageWidth: '600',
+  ogImageWidth: '300',
 
-  ogImageHeight: '600',
+  ogImageHeight: '300',
 
   ogImageType: 'image/png',
 
@@ -135,10 +120,7 @@ const structuredData = {
 
       jobTitle: 'Desenvolvedor Full Stack',
 
-      sameAs: [
-        'https://github.com/Hudsonjr90',
-        'https://www.linkedin.com/in/hudsonkennedyjr/',
-      ],
+      sameAs: ['https://github.com/Hudsonjr90', 'https://www.linkedin.com/in/hudsonkennedyjr/'],
 
       knowsAbout: [
         'JavaScript',
@@ -223,20 +205,12 @@ useHead({
 .container-style {
   position: relative;
 
-  background-image: radial-gradient(
-    circle,
-    rgba(0, 0, 0, 0.18) 1.3px,
-    transparent 1.3px
-  );
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.18) 1.3px, transparent 1.3px);
 
   background-size: 42px 42px;
 }
 
 .container-style--dark {
-  background-image: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.18) 1.3px,
-    transparent 1.3px
-  );
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.18) 1.3px, transparent 1.3px);
 }
 </style>

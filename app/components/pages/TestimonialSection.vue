@@ -281,7 +281,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section id="depoimentos" class="q-py-xl">
+  <section id="depoimentos" class="q-py-md">
     <div class="wrapper">
       <!-- Cabeçalho -->
       <div class="testimonial-heading q-mb-xl">
