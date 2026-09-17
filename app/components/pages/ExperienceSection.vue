@@ -47,7 +47,7 @@ onMounted(() => {
 <template>
   <section
     id="experiencia"
-    class="q-py-xl"
+    class="q-py-md"
   >
     <div class="wrapper">
       <!-- Cabeçalho -->

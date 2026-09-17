@@ -304,7 +304,7 @@ watch(
 <template>
   <section
     id="tecnologias"
-    class="q-py-xl"
+    class="q-py-md"
   >
     <div class="wrapper">
       <!-- Cabeçalho -->

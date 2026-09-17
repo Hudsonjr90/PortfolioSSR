@@ -336,7 +336,7 @@ watch(totalPages, (pages) => {
 <template>
   <section
     id="formacoes"
-    class="q-py-xl"
+    class="q-py-md"
   >
     <div class="wrapper">
       <!-- Cabeçalho -->
