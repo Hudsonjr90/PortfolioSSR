@@ -85,7 +85,7 @@ useSeoMeta({
 
   ogImage,
 
-  ogImageWidth: '600',
+  ogImageWidth: '1200',
 
   ogImageHeight: '600',
 
