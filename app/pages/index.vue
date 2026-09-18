@@ -85,9 +85,9 @@ useSeoMeta({
 
   ogImage,
 
-  ogImageWidth: '300',
+  ogImageWidth: '600',
 
-  ogImageHeight: '300',
+  ogImageHeight: '600',
 
   ogImageType: 'image/png',
 
