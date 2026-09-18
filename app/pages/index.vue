@@ -62,65 +62,48 @@ const canonicalUrl = `${siteUrl}/`
 
 const title = 'Hudson Kennedy | Desenvolvedor Full Stack'
 
-const description = 'Desenvolvedor Full Stack com foco em arquitetura de software, engenharia de software, banco de dados e de aplicações web e soluções com IA.'
+const description =
+  'Desenvolvedor Full Stack com foco em arquitetura de software, engenharia de software, banco de dados e de aplicações web e soluções com IA.'
 
 const ogImage = `${siteUrl}/logo.png`
 
 useSeoMeta({
   title,
-
   description,
-
+  keywords:
+    'Desenvolvedor Full Stack, JavaScript, TypeScript, Vue.js, Nuxt, React, Node.js, Arquitetura de Software, Microsserviços, IA',
   author: 'Hudson Kennedy',
-
+  charset: 'UTF-8',
+  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
-
   ogTitle: title,
-
   ogDescription: description,
-
   ogType: 'website',
-
   ogUrl: canonicalUrl,
-
   ogImage,
-
-  ogImageWidth: '900',
-
-  ogImageHeight: '900',
-
+  ogImageWidth: '1200',
+  ogImageHeight: '630',
   ogImageType: 'image/png',
-
   ogImageAlt: 'Hudson Kennedy - Desenvolvedor Full Stack',
-
+  ogLocale: 'pt_BR',
+  ogSiteName: 'Hudson Kennedy | Desenvolvedor Full Stack',
   twitterCard: 'summary_large_image',
-
   twitterTitle: title,
-
   twitterDescription: description,
-
   twitterImage: ogImage,
-
   twitterImageAlt: 'Hudson Kennedy - Desenvolvedor Full Stack',
 })
 
 const structuredData = {
   '@context': 'https://schema.org',
-
   '@graph': [
     {
       '@type': 'Person',
-
       '@id': `${siteUrl}/#person`,
-
       name: 'Hudson Kennedy',
-
       url: canonicalUrl,
-
       jobTitle: 'Desenvolvedor Full Stack',
-
       sameAs: ['https://github.com/Hudsonjr90', 'https://www.linkedin.com/in/hudsonkennedyjr/'],
-
       knowsAbout: [
         'JavaScript',
         'TypeScript',
@@ -141,62 +124,63 @@ const structuredData = {
         'Arquitetura de Software',
         'Microsserviços',
         'Desenvolvimento Full Stack',
+        'IA',
       ],
+      address: {
+        '@type': 'PostalAddress',
+        addressCountry: 'BR',
+      },
     },
-
     {
       '@type': 'WebSite',
-
       '@id': `${siteUrl}/#website`,
-
       url: canonicalUrl,
-
       name: 'Hudson Kennedy',
-
       description,
-
       inLanguage: 'pt-BR',
-
-      publisher: {
-        '@id': `${siteUrl}/#person`,
-      },
+      publisher: { '@id': `${siteUrl}/#person` },
     },
-
     {
       '@type': 'ProfilePage',
-
       '@id': `${siteUrl}/#profilepage`,
-
       url: canonicalUrl,
-
       name: title,
-
       description,
-
       inLanguage: 'pt-BR',
-
-      mainEntity: {
-        '@id': `${siteUrl}/#person`,
-      },
+      mainEntity: { '@id': `${siteUrl}/#person` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${siteUrl}/#breadcrumb`,
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Início',
+          item: canonicalUrl,
+        },
+      ],
     },
   ],
 }
 
 useHead({
   link: [
-    {
-      rel: 'canonical',
-      href: canonicalUrl,
-    },
+    { rel: 'canonical', href: canonicalUrl },
+    { rel: 'alternate', hreflang: 'pt-BR', href: canonicalUrl },
+    { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+    { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+    { rel: 'preconnect', href: 'https://github.com' },
+    { rel: 'preconnect', href: 'https://www.linkedin.com' },
+    { rel: 'preload', href: '/fonts/Inter.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
   ],
-
   script: [
     {
       type: 'application/ld+json',
-
       innerHTML: JSON.stringify(structuredData),
     },
   ],
+  meta: [{ name: 'theme-color', content: '#ffffff' }],
 })
 </script>
 
