@@ -57,7 +57,7 @@
 <script setup lang="ts">
 const isDark = useTheme().isDark
 
-const siteUrl = 'https://www.hudsonkennedy.dev.br'
+const siteUrl = 'https://hudsonkennedy.dev.br'
 const canonicalUrl = `${siteUrl}/`
 
 const title = 'Hudson Kennedy | Desenvolvedor Full Stack'
