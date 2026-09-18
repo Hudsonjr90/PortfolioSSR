@@ -10,7 +10,7 @@ interface SeoOptions {
 
 export const useSeo = (options: SeoOptions) => {
   const siteUrl = 'https://hudsonkennedy.dev.br'
-  const defaultOgImage = `${siteUrl}/logo.png`
+  const defaultOgImage = `${siteUrl}/og-image.png`
   const defaultOgImageAlt = 'Hudson Kennedy - Desenvolvedor Full Stack'
 
   // Define a URL canônica (padrão: página inicial)
