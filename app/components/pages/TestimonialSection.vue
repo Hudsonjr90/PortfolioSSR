@@ -537,6 +537,7 @@ onBeforeUnmount(() => {
   gap: 18px;
   width: 100%;
   margin-left: 4rem;
+  margin-top: -4rem;
 }
 
 /* ======================================================
