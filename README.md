@@ -233,7 +233,7 @@ Technologies  Testimonials
  Technology
  ```
 
- #🔄 CI/CD
+# 🔄 CI/CD
 
 O projeto possui pipeline de deploy utilizando GitHub Actions.
 
