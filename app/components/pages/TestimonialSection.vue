@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 interface TestimonialItem {
   id: string
@@ -14,23 +14,22 @@ interface TestimonialItem {
 const { data: portfolio } = usePortfolio()
 const { isMobile } = useMobile()
 
-const currentSlide = ref(0)
+const VISIBLE_PEOPLE = 3
+const MIN_READING_TIME = 6000
+const MAX_READING_TIME = 16000
+const WORDS_PER_MINUTE = 200
 
-const selectedTestimonial = ref<TestimonialItem | null>(null)
+const activeIndex = ref(0)
+const progress = ref(0)
+const isPaused = ref(false)
 
-const dialogVisible = ref(false)
+let animationFrame: number | null = null
+let startedAt = 0
+let elapsedBeforePause = 0
 
-const isHovered = ref(false)
-
-const isMobileModel = ref(false)
-
-const overflowingTestimonials = ref<Record<string, boolean>>({})
-
-const testimonialTextRefs = new Map<string, HTMLElement>()
-
-let autoplayTimer: ReturnType<typeof setInterval> | null = null
-
-let resizeObserver: ResizeObserver | null = null
+/* ======================================================
+ * DATA
+ * ====================================================== */
 
 const testimonials = computed<TestimonialItem[]>(() => {
   const items =
@@ -39,65 +38,80 @@ const testimonials = computed<TestimonialItem[]>(() => {
   return [...items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
 })
 
-const cardsPerSlide = computed(() => {
-  return isMobile.value ? 1 : 3
+const activeTestimonial = computed(() => {
+  return testimonials.value[activeIndex.value] ?? null
 })
 
-const testimonialSlides = computed(() => {
-  const slides: TestimonialItem[][] = []
+/*
+ * Exibe no máximo três pessoas.
+ *
+ * Sempre que possível, o depoimento ativo permanece
+ * no centro da lista:
+ *
+ * ativo 0 -> 0, 1, 2
+ * ativo 1 -> 0, 1, 2
+ * ativo 2 -> 1, 2, 3
+ * ativo 3 -> 2, 3, 4
+ */
+const visibleTestimonials = computed(() => {
+  const total = testimonials.value.length
 
-  for (let index = 0; index < testimonials.value.length; index += cardsPerSlide.value) {
-    slides.push(testimonials.value.slice(index, index + cardsPerSlide.value))
+  if (total <= VISIBLE_PEOPLE) {
+    return testimonials.value.map((testimonial, index) => ({
+      testimonial,
+      index,
+    }))
   }
 
-  return slides
+  let start = activeIndex.value - 1
+
+  start = Math.max(0, start)
+  start = Math.min(start, total - VISIBLE_PEOPLE)
+
+  return testimonials.value.slice(start, start + VISIBLE_PEOPLE).map((testimonial, offset) => ({
+    testimonial,
+    index: start + offset,
+  }))
 })
 
-const totalSlides = computed(() => {
-  return testimonialSlides.value.length
+/* ======================================================
+ * READING TIME
+ * ====================================================== */
+
+const readingDuration = computed(() => {
+  if (!activeTestimonial.value) {
+    return MIN_READING_TIME
+  }
+
+  return getReadingTime(activeTestimonial.value.content)
 })
 
-function updateViewport() {
-  const previousMobileState = isMobileModel.value
+function getReadingTime(content: string) {
+  const words = content.trim().split(/\s+/).filter(Boolean).length
 
-  isMobileModel.value = window.innerWidth < 768
+  const duration = (words / WORDS_PER_MINUTE) * 60_000
 
-  if (previousMobileState !== isMobileModel.value) {
-    currentSlide.value = 0
-  }
+  return Math.min(MAX_READING_TIME, Math.max(MIN_READING_TIME, duration))
 }
 
-function setTestimonialTextRef(id: string, element: unknown) {
-  if (element instanceof HTMLElement) {
-    testimonialTextRefs.set(id, element)
+/* ======================================================
+ * PROGRESS RING
+ * ====================================================== */
 
-    return
-  }
+const progressDashOffset = computed(() => {
+  /*
+   * Circunferência:
+   *
+   * 2 * PI * 46 ≈ 289.03
+   */
+  const circumference = 2 * Math.PI * 46
 
-  testimonialTextRefs.delete(id)
-}
+  return circumference - (progress.value / 100) * circumference
+})
 
-async function detectTextOverflow() {
-  await nextTick()
-
-  const result: Record<string, boolean> = {}
-
-  testimonials.value.forEach((testimonial) => {
-    const element = testimonialTextRefs.get(testimonial.id)
-
-    if (!element) {
-      return
-    }
-
-    result[testimonial.id] = element.scrollHeight > element.clientHeight + 1
-  })
-
-  overflowingTestimonials.value = result
-}
-
-function isTestimonialOverflowing(id: string) {
-  return overflowingTestimonials.value[id] ?? false
-}
+/* ======================================================
+ * AVATAR
+ * ====================================================== */
 
 function getImageFileName(avatarUrl: string | null) {
   if (!avatarUrl) {
@@ -134,156 +148,175 @@ function getInitials(name: string) {
     .join('')
 }
 
-function openTestimonial(testimonial: TestimonialItem) {
-  stopAutoplay()
+/* ======================================================
+ * PROGRESS
+ * ====================================================== */
 
-  selectedTestimonial.value = testimonial
+function startProgress() {
+  stopAnimation()
 
-  dialogVisible.value = true
+  if (testimonials.value.length <= 1 || isPaused.value) {
+    return
+  }
+
+  startedAt = performance.now()
+
+  animationFrame = requestAnimationFrame(updateProgress)
 }
 
-function closeTestimonial() {
-  dialogVisible.value = false
-  selectedTestimonial.value = null
+function updateProgress(timestamp: number) {
+  if (isPaused.value) {
+    return
+  }
 
-  if (!isHovered.value) {
-    startAutoplay()
+  const currentElapsed = elapsedBeforePause + (timestamp - startedAt)
+
+  const percentage = (currentElapsed / readingDuration.value) * 100
+
+  progress.value = Math.min(percentage, 100)
+
+  if (percentage >= 100) {
+    goToNextTestimonial()
+    return
+  }
+
+  animationFrame = requestAnimationFrame(updateProgress)
+}
+
+function stopAnimation() {
+  if (animationFrame === null) {
+    return
+  }
+
+  cancelAnimationFrame(animationFrame)
+  animationFrame = null
+}
+
+function resetProgress() {
+  stopAnimation()
+
+  progress.value = 0
+  elapsedBeforePause = 0
+  startedAt = performance.now()
+}
+
+function pauseProgress() {
+  if (isPaused.value) {
+    return
+  }
+
+  isPaused.value = true
+
+  if (startedAt) {
+    elapsedBeforePause += performance.now() - startedAt
+  }
+
+  stopAnimation()
+}
+
+function resumeProgress() {
+  if (!isPaused.value) {
+    return
+  }
+
+  isPaused.value = false
+
+  startProgress()
+}
+
+/* ======================================================
+ * NAVIGATION
+ * ====================================================== */
+
+function selectTestimonial(index: number) {
+  if (index < 0 || index >= testimonials.value.length) {
+    return
+  }
+
+  activeIndex.value = index
+
+  resetProgress()
+
+  if (!isPaused.value) {
+    startProgress()
   }
 }
 
-function startAutoplay() {
-  stopAutoplay()
-
-  if (totalSlides.value <= 1) {
+function goToNextTestimonial() {
+  if (!testimonials.value.length) {
     return
   }
 
-  if (dialogVisible.value) {
+  activeIndex.value = (activeIndex.value + 1) % testimonials.value.length
+
+  resetProgress()
+
+  if (!isPaused.value) {
+    startProgress()
+  }
+}
+
+function goToPreviousTestimonial() {
+  if (!testimonials.value.length) {
     return
   }
 
-  if (isHovered.value) {
-    return
-  }
+  activeIndex.value =
+    activeIndex.value === 0 ? testimonials.value.length - 1 : activeIndex.value - 1
 
-  autoplayTimer = setInterval(() => {
-    if (dialogVisible.value || isHovered.value || totalSlides.value <= 1) {
+  resetProgress()
+
+  if (!isPaused.value) {
+    startProgress()
+  }
+}
+
+/* ======================================================
+ * WATCHERS
+ * ====================================================== */
+
+watch(
+  () => testimonials.value.length,
+  (total) => {
+    if (!total) {
+      stopAnimation()
+      activeIndex.value = 0
+      progress.value = 0
       return
     }
 
-    currentSlide.value = (currentSlide.value + 1) % totalSlides.value
-
-    detectTextOverflow()
-  }, 5000)
-}
-
-function stopAutoplay() {
-  if (!autoplayTimer) {
-    return
-  }
-
-  clearInterval(autoplayTimer)
-
-  autoplayTimer = null
-}
-
-function pauseCarousel() {
-  isHovered.value = true
-  stopAutoplay()
-}
-
-function resumeCarousel() {
-  isHovered.value = false
-  startAutoplay()
-}
-
-function handleSlideChange(slide: string | number) {
-  currentSlide.value = Number(slide)
-
-  detectTextOverflow()
-}
-
-async function goToPreviousSlide() {
-  currentSlide.value = currentSlide.value === 0 ? totalSlides.value - 1 : currentSlide.value - 1
-
-  await detectTextOverflow()
-}
-
-async function goToNextSlide() {
-  currentSlide.value = (currentSlide.value + 1) % totalSlides.value
-
-  await detectTextOverflow()
-}
-
-watch(
-  () => cardsPerSlide.value,
-  async () => {
-    currentSlide.value = 0
-
-    await nextTick()
-
-    await detectTextOverflow()
-
-    startAutoplay()
-  },
-)
-
-watch(testimonials, async () => {
-  await nextTick()
-
-  await detectTextOverflow()
-})
-
-watch(
-  () => dialogVisible.value,
-  (visible) => {
-    if (visible) {
-      stopAutoplay()
-      return
+    if (activeIndex.value >= total) {
+      activeIndex.value = 0
     }
 
-    if (!isHovered.value) {
-      startAutoplay()
+    resetProgress()
+
+    if (!isPaused.value) {
+      startProgress()
     }
   },
 )
 
-onMounted(async () => {
-  updateViewport()
+/* ======================================================
+ * LIFECYCLE
+ * ====================================================== */
 
-  window.addEventListener('resize', updateViewport)
-
-  await nextTick()
-
-  await detectTextOverflow()
-
-  resizeObserver = new ResizeObserver(() => {
-    detectTextOverflow()
-  })
-
-  testimonialTextRefs.forEach((element) => {
-    resizeObserver?.observe(element)
-  })
-
-  startAutoplay()
+onMounted(() => {
+  startProgress()
 })
 
 onBeforeUnmount(() => {
-  stopAutoplay()
-
-  window.removeEventListener('resize', updateViewport)
-
-  resizeObserver?.disconnect()
-  resizeObserver = null
-
-  testimonialTextRefs.clear()
+  stopAnimation()
 })
 </script>
 
 <template>
   <section id="depoimentos" class="q-py-md">
     <div class="wrapper">
-      <!-- Cabeçalho -->
+      <!-- =================================================
+           HEADER
+           ================================================= -->
+
       <div class="testimonial-heading q-mb-xl">
         <div class="text-overline text-primary text-weight-bold">Depoimentos</div>
 
@@ -298,305 +331,314 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <!-- Carousel -->
+      <!-- =================================================
+           TESTIMONIALS
+           ================================================= -->
+
       <div
-        v-if="testimonialSlides.length"
-        class="testimonial-carousel-wrapper"
-        @mouseenter="pauseCarousel"
-        @mouseleave="resumeCarousel"
+        v-if="testimonials.length && activeTestimonial"
+        class="testimonials-showcase"
+        @mouseenter="pauseProgress"
+        @mouseleave="resumeProgress"
       >
-        <q-carousel
-          :model-value="currentSlide"
-          class="testimonial-carousel"
-          animated
-          swipeable
-          infinite
-          control-color="primary"
-          transition-prev="slide-right"
-          transition-next="slide-left"
-          @update:model-value="handleSlideChange"
-        >
-          <q-carousel-slide
-            v-for="(slide, slideIndex) in testimonialSlides"
-            :key="slideIndex"
-            :name="slideIndex"
-            class="testimonial-slide"
-          >
-            <div class="testimonial-grid">
-              <q-card
-                v-for="testimonial in slide"
-                :key="testimonial.id"
-                flat
-                bordered
-                clickable
-                class="testimonial-card bg-transparent backdrop-blur"
-                @click="openTestimonial(testimonial)"
-              >
-                <q-card-section class="testimonial-card-content">
-                  <!-- Citação -->
-                  <div class="testimonial-quote">
-                    <q-icon name="mdi-format-quote-open" size="34px" color="primary" />
-                  </div>
+        <!-- ===============================================
+             PEOPLE
+             =============================================== -->
 
-                  <!-- Conteúdo -->
-                  <div
-                    :ref="(element) => setTestimonialTextRef(testimonial.id, element)"
-                    class="testimonial-content text-body1"
-                    :class="{
-                      'testimonial-content-truncated': isTestimonialOverflowing(testimonial.id),
+        <div class="testimonial-people">
+          <TransitionGroup name="testimonial-person-list">
+            <button
+              v-for="{ testimonial, index } in visibleTestimonials"
+              :key="testimonial.id"
+              type="button"
+              class="testimonial-person"
+              :class="{
+                'testimonial-person-active': activeIndex === index,
+              }"
+              :aria-label="`Ver depoimento de ${testimonial.name}`"
+              :aria-current="activeIndex === index ? 'true' : undefined"
+              @click="selectTestimonial(index)"
+            >
+              <!-- Avatar + progress -->
+
+              <div class="testimonial-avatar-progress">
+                <svg class="testimonial-progress-ring" viewBox="0 0 100 100" aria-hidden="true">
+                  <circle class="testimonial-progress-track" cx="50" cy="50" r="46" />
+
+                  <circle
+                    v-if="activeIndex === index"
+                    class="testimonial-progress-value"
+                    cx="50"
+                    cy="50"
+                    r="46"
+                    :style="{
+                      strokeDashoffset: progressDashOffset,
                     }"
-                  >
-                    {{ testimonial.content }}
+                  />
+                </svg>
+
+                <q-avatar size="64px" class="testimonial-person-avatar">
+                  <img
+                    v-if="getTestimonialAvatar(testimonial.avatarUrl)"
+                    :src="getTestimonialAvatar(testimonial.avatarUrl) ?? undefined"
+                    :alt="`Foto de ${testimonial.name}`"
+                  />
+
+                  <span v-else class="testimonial-initials">
+                    {{ getInitials(testimonial.name) }}
+                  </span>
+                </q-avatar>
+              </div>
+
+              <!-- Person info -->
+
+              <!-- <div
+                class="testimonial-person-info"
+              >
+                <span
+                  class="testimonial-person-name"
+                >
+                  {{ testimonial.name }}
+                </span>
+
+                <span
+                  v-if="testimonial.company"
+                  class="testimonial-person-company"
+                >
+                  {{ testimonial.company }}
+                </span>
+              </div> -->
+            </button>
+          </TransitionGroup>
+        </div>
+
+        <!-- ===============================================
+             ACTIVE TESTIMONIAL
+             =============================================== -->
+
+        <div class="testimonial-stage">
+          <Transition name="testimonial-change" mode="out-in">
+            <article :key="activeTestimonial.id" class="testimonial-active">
+              <q-icon
+                name="mdi-format-quote-open"
+                size="42px"
+                color="primary"
+                class="testimonial-quote"
+              />
+
+              <blockquote class="testimonial-text">
+                {{ activeTestimonial.content }}
+              </blockquote>
+              
+
+              <!-- Author -->
+
+              <div class="testimonial-footer">
+                <div>
+                  <div class="testimonial-active-name">
+                    {{ activeTestimonial.name }}
                   </div>
 
-                  <!-- Ler depoimento -->
                   <div
-                    v-if="isTestimonialOverflowing(testimonial.id)"
-                    class="testimonial-read-more"
+                    v-if="activeTestimonial.role || activeTestimonial.company"
+                    class="testimonial-active-meta"
                   >
-                    <span> Ler depoimento </span>
+                    <span v-if="activeTestimonial.role">
+                      {{ activeTestimonial.role }}
+                    </span>
 
-                    <q-icon name="mdi-arrow-right" size="18px" />
+                    <span v-if="activeTestimonial.role && activeTestimonial.company"> · </span>
+
+                    <span v-if="activeTestimonial.company">
+                      {{ activeTestimonial.company }}
+                    </span>
+
                   </div>
+                </div>
+              </div>
+            </article>
+          </Transition>
 
-                  <!-- Autor -->
-                  <div class="testimonial-author">
-                    <q-avatar size="52px" class="testimonial-avatar">
-                      <img
-                        v-if="getTestimonialAvatar(testimonial.avatarUrl)"
-                        :src="getTestimonialAvatar(testimonial.avatarUrl) ?? undefined"
-                        :alt="`Foto de ${testimonial.name}`"
-                      />
+          <!-- =============================================
+               NAVIGATION
+               ============================================= -->
 
-                      <span v-else class="testimonial-initials">
-                        {{ getInitials(testimonial.name) }}
-                      </span>
-                    </q-avatar>
+          <div v-if="testimonials.length > 1" class="testimonial-navigation">
+            <q-btn
+              round
+              flat
+              icon="mdi-chevron-left"
+              aria-label="Depoimento anterior"
+              @click="goToPreviousTestimonial"
+            />
 
-                    <div class="testimonial-author-info">
-                      <div class="text-body1 text-weight-bold">
-                        {{ testimonial.name }}
-                      </div>
+            <span class="testimonial-counter">
+              {{ String(activeIndex + 1).padStart(2, '0') }}
 
-                      <div
-                        v-if="testimonial.company"
-                        class="text-caption text-primary text-weight-medium"
-                      >
-                        {{ testimonial.company }}
-                      </div>
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
-            </div>
-          </q-carousel-slide>
+              <span class="testimonial-counter-divider"> / </span>
 
-          <!-- Setas -->
-          <template #control v-if="!isMobile">
-            <q-carousel-control position="top-left" :offset="[0, 180]">
-              <q-btn
-                round
-                flat
-                class="bg-primary"
-                icon="mdi-chevron-left"
-                aria-label="Depoimento anterior"
-                @click="goToPreviousSlide()"
-              />
-            </q-carousel-control>
+              {{ String(testimonials.length).padStart(2, '0') }}
+            </span>
 
-            <q-carousel-control position="top-right" :offset="[0, 180]">
-              <q-btn
-                round
-                flat
-                class="bg-primary"
-                icon="mdi-chevron-right"
-                aria-label="Próximo depoimento"
-                @click="goToNextSlide()"
-              />
-            </q-carousel-control>
-          </template>
-        </q-carousel>
-
-        <!-- Indicadores -->
-        <div v-if="totalSlides > 1" class="testimonial-indicators">
-          <button
-            v-for="(_, index) in testimonialSlides"
-            :key="index"
-            type="button"
-            class="testimonial-indicator"
-            :class="{
-              'testimonial-indicator-active': currentSlide === index,
-            }"
-            :aria-label="`Ir para depoimentos ${index + 1}`"
-            :aria-current="currentSlide === index ? 'true' : undefined"
-            @click="currentSlide = index"
-          />
+            <q-btn
+              round
+              flat
+              icon="mdi-chevron-right"
+              aria-label="Próximo depoimento"
+              @click="goToNextTestimonial"
+            />
+          </div>
         </div>
       </div>
 
-      <!-- Estado vazio -->
+      <!-- =================================================
+           EMPTY
+           ================================================= -->
+
       <div v-else class="testimonial-empty">
         <q-icon name="mdi-comment-quote-outline" size="48px" color="primary" />
 
         <div class="text-body1 q-mt-md">Nenhum depoimento disponível.</div>
       </div>
     </div>
-
-    <!-- Dialog -->
-    <q-dialog v-model="dialogVisible" @hide="closeTestimonial">
-      <q-card class="testimonial-dialog">
-        <q-btn
-          round
-          flat
-          dense
-          icon="mdi-close"
-          color="grey-7"
-          aria-label="Fechar depoimento"
-          class="testimonial-dialog-close"
-          v-close-popup
-        />
-
-        <q-card-section v-if="selectedTestimonial" class="testimonial-dialog-content">
-          <!-- Autor -->
-          <div class="testimonial-dialog-author">
-            <q-avatar size="76px" class="testimonial-avatar">
-              <img
-                v-if="getTestimonialAvatar(selectedTestimonial.avatarUrl)"
-                :src="getTestimonialAvatar(selectedTestimonial.avatarUrl) ?? undefined"
-                :alt="`Foto de ${selectedTestimonial.name}`"
-              />
-
-              <span v-else class="testimonial-initials">
-                {{ getInitials(selectedTestimonial.name) }}
-              </span>
-            </q-avatar>
-
-            <div class="testimonial-dialog-author-info">
-              <div class="text-h6 text-weight-bold">
-                {{ selectedTestimonial.name }}
-              </div>
-
-              <div
-                v-if="selectedTestimonial.company"
-                class="text-body2 text-primary text-weight-medium"
-              >
-                {{ selectedTestimonial.company }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Conteúdo completo -->
-          <div class="testimonial-dialog-quote q-mt-xl">
-            <q-icon name="mdi-format-quote-open" size="42px" color="primary" />
-          </div>
-
-          <div class="testimonial-dialog-text q-mt-sm">
-            {{ selectedTestimonial.content }}
-          </div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </section>
 </template>
 
 <style scoped>
+/* ======================================================
+   HEADER
+   ====================================================== */
+
 .testimonial-heading {
   max-width: 850px;
 }
 
-.testimonial-carousel-wrapper {
-  position: relative;
-}
+/* ======================================================
+   MAIN LAYOUT
+   ====================================================== */
 
-.testimonial-carousel {
-  height: 420px;
-  background: transparent;
-}
-
-.testimonial-slide {
-  padding: 16px 48px 56px;
-}
-
-.testimonial-grid {
+.testimonials-showcase {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  grid-template-columns:
+    220px
+    minmax(0, 1fr);
+  align-items: center;
+  min-height: 460px;
 }
 
-.testimonial-card {
-  min-width: 0;
-  height: 400px;
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    background-color 0.25s ease;
-}
+/* ======================================================
+   PEOPLE
+   ====================================================== */
 
-.testimonial-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(0, 212, 255, 0.5);
-}
-
-.testimonial-card-content {
+.testimonial-people {
+  position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 28px;
+  gap: 18px;
+  width: 100%;
+  margin-left: 4rem;
 }
 
-.testimonial-quote {
-  line-height: 1;
-  margin-bottom: 12px;
-}
+/* ======================================================
+   PERSON
+   ====================================================== */
 
-.testimonial-content {
-  height: 10.2em;
-  min-height: 10.2em;
-  overflow: hidden;
-  line-height: 1.7;
+.testimonial-person {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 6px;
+  border: 0;
+  background: transparent;
   color: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.42;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
-.testimonial-content-truncated {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
-  text-overflow: ellipsis;
+.testimonial-person:hover {
+  opacity: 0.75;
 }
 
-.testimonial-read-more {
+.testimonial-person-active {
+  opacity: 1;
+
+  transform: translateX(8px);
+}
+
+/* ======================================================
+   AVATAR + CIRCULAR PROGRESS
+   ====================================================== */
+
+.testimonial-avatar-progress {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 14px;
-  color: #00d4ff;
-  font-size: 14px;
-  font-weight: 700;
+  justify-content: center;
+  width: 78px;
+  height: 78px;
+  flex: 0 0 78px;
 }
 
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: auto;
-  padding-top: 22px;
+/* SVG */
+
+.testimonial-progress-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
 }
 
-.testimonial-avatar {
-  flex-shrink: 0;
+/* Rings */
+
+.testimonial-progress-track,
+.testimonial-progress-value {
+  fill: none;
+  stroke-width: 3;
+}
+
+.testimonial-progress-track {
+  stroke: rgba(100, 116, 139, 0.22);
+}
+
+.testimonial-progress-value {
+  stroke: #00d4ff;
+  stroke-linecap: round;
+  stroke-dasharray: 289.03;
+  stroke-dashoffset: 289.03;
+  filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.45));
+}
+
+.testimonial-person-avatar {
+  position: relative;
+  z-index: 1;
   overflow: hidden;
   background: rgba(0, 212, 255, 0.12);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
-.testimonial-avatar img {
+.testimonial-person-active .testimonial-person-avatar {
+  transform: scale(1.04);
+  box-shadow:
+    0 0 0 3px rgba(0, 212, 255, 0.08),
+    0 8px 30px rgba(0, 212, 255, 0.12);
+}
+
+.testimonial-person-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
+/* Initials */
 
 .testimonial-initials {
   display: flex;
@@ -609,149 +651,393 @@ onBeforeUnmount(() => {
   font-weight: 700;
 }
 
-.testimonial-author-info {
+/* ======================================================
+   PERSON INFO
+   ====================================================== */
+
+.testimonial-person-info {
+  display: flex;
+
+  flex-direction: column;
+
   min-width: 0;
 }
 
-.testimonial-author-info .text-body1 {
+.testimonial-person-name {
   overflow: hidden;
+
+  font-size: 15px;
+  font-weight: 700;
+
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
-.testimonial-indicators {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 18px;
+.testimonial-person-company {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #00d4ff;
+
+  font-size: 12px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
 }
 
-.testimonial-indicator {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: #64748b;
-  cursor: pointer;
-  opacity: 0.55;
-  transition:
-    width 0.2s ease,
-    background-color 0.2s ease,
-    opacity 0.2s ease;
-}
+/* ======================================================
+   ACTIVE TESTIMONIAL
+   ====================================================== */
 
-.testimonial-indicator-active {
-  width: 24px;
-  border-radius: 8px;
-  background: #00d4ff;
-  opacity: 1;
-}
-
-.testimonial-empty {
+.testimonial-stage {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: 240px;
-  text-align: center;
-}
-
-.testimonial-dialog {
-  position: relative;
-  width: min(720px, calc(100vw - 32px));
-  max-width: 720px;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.testimonial-dialog-content {
-  padding: 36px;
-}
-
-.testimonial-dialog-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
-}
-
-.testimonial-dialog-author {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding-right: 36px;
-}
-
-.testimonial-dialog-author-info {
+  width: 100%;
   min-width: 0;
+  min-height: 360px;
 }
 
-.testimonial-dialog-quote {
-  line-height: 1;
+.testimonial-active {
+  width: 100%;
+
+  max-width: 100%;
 }
 
-.testimonial-dialog-text {
-  max-height: 55vh;
-  overflow-y: auto;
-  padding-right: 8px;
-  font-size: 17px;
-  line-height: 1.8;
+/* Quote icon */
+
+.testimonial-quote {
+  margin-bottom: 14px;
+}
+
+/* Text */
+
+.testimonial-text {
+  width: 100%;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.015em;
   white-space: pre-line;
 }
 
+/* ======================================================
+   AUTHOR
+   ====================================================== */
+
+.testimonial-footer {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-between;
+
+  margin-top: 38px;
+}
+
+.testimonial-active-name {
+  font-size: 18px;
+
+  font-weight: 700;
+}
+
+.testimonial-active-meta {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin-top: 4px;
+
+  color: #00d4ff;
+
+  font-size: 14px;
+}
+
+/* ======================================================
+   NAVIGATION
+   ====================================================== */
+
+.testimonial-navigation {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 34px;
+}
+
+.testimonial-navigation :deep(.q-btn) {
+  color: inherit;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.testimonial-navigation :deep(.q-btn:hover) {
+  color: #00d4ff;
+
+  background: rgba(0, 212, 255, 0.08);
+
+  transform: scale(1.05);
+}
+
+/* Counter */
+
+.testimonial-counter {
+  min-width: 68px;
+
+  color: #94a3b8;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  text-align: center;
+
+  letter-spacing: 0.08em;
+}
+
+.testimonial-counter-divider {
+  margin: 0 3px;
+
+  opacity: 0.45;
+}
+
+/* ======================================================
+   PEOPLE LIST TRANSITION
+   ====================================================== */
+
+.testimonial-person-list-move,
+.testimonial-person-list-enter-active,
+.testimonial-person-list-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.testimonial-person-list-enter-from {
+  opacity: 0;
+
+  transform: translateY(16px);
+}
+
+.testimonial-person-list-leave-to {
+  opacity: 0;
+
+  transform: translateY(-16px);
+}
+
+/*
+ * Evita que o item saindo empurre os demais
+ * durante a animação.
+ */
+.testimonial-person-list-leave-active {
+  position: absolute;
+}
+
+/* ======================================================
+   TESTIMONIAL CHANGE
+   ====================================================== */
+
+.testimonial-change-enter-active,
+.testimonial-change-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.testimonial-change-enter-from {
+  opacity: 0;
+
+  transform: translateY(16px);
+}
+
+.testimonial-change-leave-to {
+  opacity: 0;
+
+  transform: translateY(-10px);
+}
+
+/* ======================================================
+   EMPTY
+   ====================================================== */
+
+.testimonial-empty {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 240px;
+
+  text-align: center;
+}
+
+/* ======================================================
+   TABLET
+   ====================================================== */
+
+@media (max-width: 1023px) {
+  .testimonials-showcase {
+    grid-template-columns:
+      110px
+      minmax(0, 1fr);
+
+    gap: 42px;
+  }
+
+  .testimonial-people {
+    align-items: center;
+  }
+
+  .testimonial-person {
+    width: auto;
+  }
+
+  .testimonial-person-info {
+    display: none;
+  }
+}
+
+/* ======================================================
+   MOBILE
+   ====================================================== */
+
 @media (max-width: 767px) {
-  .testimonial-carousel {
-    height: 470px;
+  .testimonials-showcase {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 28px;
+
+    min-height: auto;
   }
 
-  .testimonial-slide {
-    padding: 16px 36px 56px;
+  .testimonial-people {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    min-height: 78px;
+    padding: 4px 0;
   }
 
-  .testimonial-grid {
-    grid-template-columns: 1fr;
+  .testimonial-person {
+    width: auto;
+    flex: 0 0 auto;
+    padding: 3px;
+    opacity: 0.42;
   }
 
-  .testimonial-card {
-    height: 100%;
+  .testimonial-person-active {
+    opacity: 1;
+    transform: none;
   }
 
-  .testimonial-card-content {
-    padding: 24px;
+  .testimonial-avatar-progress {
+    width: 70px;
+    height: 70px;
+    flex-basis: 70px;
   }
 
-  .testimonial-content {
-    height: 10.2em;
-    min-height: 10.2em;
+  .testimonial-person-avatar {
+    width: 56px !important;
+    height: 56px !important;
   }
 
-  .testimonial-dialog {
-    width: calc(100vw - 24px);
-    border-radius: 16px;
+  .testimonial-person-list-leave-active {
+    position: relative;
   }
 
-  .testimonial-dialog-content {
-    padding: 28px 24px;
+  .testimonial-stage {
+    width: 100%;
+    min-height: 390px;
   }
 
-  .testimonial-dialog-author {
-    gap: 14px;
+  .testimonial-quote {
+    margin-bottom: 10px;
   }
 
-  .testimonial-dialog-text {
-    max-height: 60vh;
+  .testimonial-text {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .testimonial-footer {
+    margin-top: 30px;
+  }
+
+  .testimonial-active-name {
+    font-size: 17px;
+  }
+
+  .testimonial-active-meta {
+    font-size: 13px;
+  }
+
+  /* Navigation */
+
+  .testimonial-navigation {
+    margin-top: 26px;
+    justify-content: center;
+  }
+}
+
+/* ======================================================
+   SMALL MOBILE
+   ====================================================== */
+
+@media (max-width: 420px) {
+  .testimonial-people {
+    gap: 8px;
+  }
+
+  .testimonial-avatar-progress {
+    width: 66px;
+    height: 66px;
+
+    flex-basis: 66px;
+  }
+
+  .testimonial-person-avatar {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+  .testimonial-text {
     font-size: 16px;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .testimonial-card {
-    transition: none;
-  }
+/* ======================================================
+   REDUCED MOTION
+   ====================================================== */
 
-  .testimonial-indicator {
+@media (prefers-reduced-motion: reduce) {
+  .testimonial-person,
+  .testimonial-person-avatar,
+  .testimonial-navigation :deep(.q-btn),
+  .testimonial-person-list-move,
+  .testimonial-person-list-enter-active,
+  .testimonial-person-list-leave-active,
+  .testimonial-change-enter-active,
+  .testimonial-change-leave-active {
     transition: none;
   }
 }

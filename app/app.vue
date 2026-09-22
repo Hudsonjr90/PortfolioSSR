@@ -14,7 +14,6 @@ useHead({
   ],
   link: [
     { rel: 'icon', type: 'image/png', href: '/favicon.png' },
-    { rel: 'preload', href: '/fonts/Inter.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
   ],
 })
 </script>
