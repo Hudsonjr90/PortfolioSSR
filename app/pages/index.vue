@@ -61,7 +61,7 @@ const isDark = useTheme().isDark
 
 useSeo({
   title: 'Hudson Kennedy | Desenvolvedor Full Stack',
-  description: 'Desenvolvedor Full Stack com foco em arquitetura de software, engenharia de software, banco de dados e aplicações web com IA.',
+  description: 'Desenvolvedor Full Stack com foco em arquitetura e engenharia de software além de banco de dados e aplicações web com IA.',
 })
 </script>
 
