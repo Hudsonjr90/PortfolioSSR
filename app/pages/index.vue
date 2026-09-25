@@ -31,6 +31,12 @@
             <q-separator color="grey-8" />
           </div>
 
+          <ProjectsSection />
+
+          <div class="wrapper q-my-xl">
+            <q-separator color="grey-8" />
+          </div>
+
           <TestimonialSection />
 
           <div class="wrapper q-my-xl">

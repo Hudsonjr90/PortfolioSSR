@@ -55,6 +55,11 @@ const sections = [
     icon: 'mdi-message-text-outline',
   },
   {
+    id: 'projetos',
+    label: 'Projetos',
+    icon: 'mdi-folder-outline',
+  },
+  {
     id: 'tecnologias',
     label: 'Tecnologias',
     icon: 'mdi-laptop-account',
