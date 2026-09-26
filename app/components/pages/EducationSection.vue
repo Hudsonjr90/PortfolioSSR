@@ -4,7 +4,6 @@ import { computed, ref, watch } from 'vue'
 const { data: portfolio } = usePortfolio()
 
 const { pageSize, isMobile } = useMobile()
-const { isDark } = useTheme()
 
 const totalPages = computed(() =>
   Math.max(
@@ -46,7 +45,6 @@ const educationAssets: Record<string, EducationAsset> = {
     institution: 'Universidade de Harvard',
     type: 'Mestrado',
     category: 'Acadêmico',
-    year: '2023',
   },
 
   'Pós-graduação em Engenharia de Software': {
@@ -264,6 +262,20 @@ const educationAssets: Record<string, EducationAsset> = {
     type: 'Curso',
     category: 'Técnico',
   },
+  'Arrays e estruturas de repetição em JavaScript': {
+    image: '/images/education/aerj.webp',
+    pdf: '/images/education-pdf/arrays-e-estruturas-de-repeticao.pdf',
+    institution: 'Digital Innovation One',
+    type: 'Curso',
+    category: 'Técnico',
+  },
+  'Criando objetos e classes em JavaScript': {
+    image: '/images/education/cobj.webp',
+    pdf: '/images/education-pdf/criando-objetos-e-classes-em-javascript.pdf',
+    institution: 'Digital Innovation One',
+    type: 'Curso',
+    category: 'Técnico',
+  }
 }
 
 function normalize(value: string) {
