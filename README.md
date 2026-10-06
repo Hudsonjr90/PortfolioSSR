@@ -212,6 +212,21 @@ O conteúdo do portfólio é armazenado em PostgreSQL.
 
 A estrutura permite relacionar diferentes partes da trajetória profissional.
 
+Os projetos são armazenados na tabela `Project`. Para aplicar a migração e inserir os
+projetos iniciais, configure `DATABASE_URL` e execute:
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+No ambiente local, a rota `/admin` permite entrar com a senha definida em
+`DEV_ADMIN_PASSWORD` no `.env` e cadastrar, editar, publicar ou remover projetos.
+Essa área e suas APIs ficam indisponíveis quando a aplicação é executada em produção.
+Imagens locais devem usar o nome do arquivo em `app/assets/images` (por exemplo,
+`agenda.png`); GIFs podem usar um caminho relativo como `gifs/agenda.gif`. Também é
+possível informar URLs públicas para imagens e GIFs.
+
 Uma representação simplificada:
 ```text
                      ┌──────────────┐

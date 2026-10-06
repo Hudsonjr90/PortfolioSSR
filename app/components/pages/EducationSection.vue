@@ -1,3 +1,155 @@
+<template>
+  <section id="formacoes" class="q-py-md">
+    <div class="wrapper">
+      <!-- Cabeçalho -->
+      <div class="q-mb-xl">
+        <div class="text-overline text-primary text-weight-bold">Formação acadêmica</div>
+
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
+          Educação e aprendizado contínuo
+        </div>
+
+        <div class="text-body1 q-mt-md">
+          Minha trajetória reúne formação acadêmica, especializações, bootcamps e cursos voltados ao
+          desenvolvimento de software, arquitetura, negócios e tecnologia.
+        </div>
+      </div>
+
+      <!-- Formações -->
+      <div v-if="paginatedEducation.length" class="row q-col-gutter-lg">
+        <q-intersection
+          v-for="education in paginatedEducation"
+          :key="education.id"
+          transition="scale"
+          class="education-intersection col-12 col-md-6 col-lg-4"
+        >
+          <q-card flat bordered class="education-card full-height bg-transparent backdrop-blur">
+            <!-- Imagem -->
+            <button
+              v-if="getAsset(education.course)"
+              type="button"
+              class="education-image-button"
+              :aria-label="`Visualizar certificado de ${education.course}`"
+              @click="openImage(education.course)"
+            >
+              <q-img
+                :src="getAsset(education.course)?.image"
+                :alt="`${education.course} - ${getInstitution(
+                  education.course,
+                  education.institution,
+                )}`"
+                fit="cover"
+                class="education-image"
+              />
+
+              <div class="education-image-overlay">
+                <q-icon name="mdi-magnify-plus-outline" size="30px" />
+
+                <span>Visualizar</span>
+              </div>
+            </button>
+
+            <div v-else class="education-image-placeholder flex flex-center">
+              <q-icon name="mdi-school-outline" size="64px" color="primary" />
+            </div>
+
+            <!-- Conteúdo -->
+            <q-card-section class="education-content">
+              <!-- Instituição -->
+              <div class="text-caption text-primary text-weight-bold">
+                {{ getInstitution(education.course, education.institution) }}
+              </div>
+
+              <!-- Curso -->
+              <div class="text-h6 text-weight-bold q-mt-xs">
+                {{ education.course }}
+              </div>
+
+              <!-- Metadados -->
+              <div class="row items-center q-gutter-xs q-mt-md">
+                <q-badge outline color="primary" :label="getType(education.course)" />
+
+                <q-badge
+                  v-if="getCategory(education.course)"
+                  outline
+                  color="primary"
+                  :label="getCategory(education.course)"
+                />
+              </div>
+            </q-card-section>
+
+            <!-- Ações -->
+            <q-separator />
+
+            <q-card-actions class="justify-between q-px-md q-py-sm q-mb-md q-mt-md">
+              <div class="text-caption">
+                {{ getType(education.course) }}
+              </div>
+
+              <a
+                v-if="getAsset(education.course)?.pdf"
+                :href="getAsset(education.course)?.pdf"
+                :download="`${education.course}.pdf`"
+                class="education-download"
+              >
+                <q-icon name="mdi-file-download-outline" size="18px" />
+
+                <span>Certificado</span>
+              </a>
+            </q-card-actions>
+          </q-card>
+        </q-intersection>
+      </div>
+
+      <!-- Sem formações -->
+      <q-card v-else flat bordered>
+        <q-card-section class="text-center q-pa-xl">
+          <q-icon name="mdi-school-outline" size="56px" color="grey-5" />
+
+          <div class="text-h6 q-mt-md">Nenhuma formação cadastrada</div>
+        </q-card-section>
+      </q-card>
+
+      <!-- Paginação -->
+      <div v-if="totalPages > 1" class="row justify-center q-mt-xl">
+        <q-pagination
+          v-model="currentPage"
+          :max="totalPages"
+          :max-pages="7"
+          boundary-numbers
+          direction-links
+          color="primary"
+        />
+      </div>
+    </div>
+
+    <!-- Preview do certificado -->
+    <q-dialog v-model="previewDialog" maximized @hide="closeImage">
+      <q-card class="education-preview">
+        <q-bar class="education-preview-header">
+          <div class="ellipsis">
+            {{ previewTitle }}
+          </div>
+
+          <q-space />
+
+          <q-btn flat round dense icon="mdi-close" aria-label="Fechar" @click="closeImage" />
+        </q-bar>
+
+        <q-card-section class="education-preview-content">
+          <q-img
+            v-if="previewImage"
+            :src="previewImage"
+            :alt="previewTitle"
+            fit="contain"
+            class="education-preview-image"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
@@ -6,22 +158,13 @@ const { data: portfolio } = usePortfolio()
 const { pageSize, isMobile } = useMobile()
 
 const totalPages = computed(() =>
-  Math.max(
-    1,
-    Math.ceil(
-      sortedEducation.value.length / pageSize.value,
-    ),
-  ),
+  Math.max(1, Math.ceil(sortedEducation.value.length / pageSize.value)),
 )
 
 const paginatedEducation = computed(() => {
-  const start =
-    (currentPage.value - 1) * pageSize.value
+  const start = (currentPage.value - 1) * pageSize.value
 
-  return sortedEducation.value.slice(
-    start,
-    start + pageSize.value,
-  )
+  return sortedEducation.value.slice(start, start + pageSize.value)
 })
 
 const currentPage = ref(1)
@@ -275,7 +418,7 @@ const educationAssets: Record<string, EducationAsset> = {
     institution: 'Digital Innovation One',
     type: 'Curso',
     category: 'Técnico',
-  }
+  },
 }
 
 function normalize(value: string) {
@@ -295,9 +438,7 @@ function getAsset(course: string) {
 
   const normalizedCourse = normalize(course)
 
-  const match = Object.entries(educationAssets).find(
-    ([key]) => normalize(key) === normalizedCourse,
-  )
+  const match = Object.entries(educationAssets).find(([key]) => normalize(key) === normalizedCourse)
 
   return match?.[1] ?? null
 }
@@ -344,219 +485,6 @@ watch(totalPages, (pages) => {
   }
 })
 </script>
-
-<template>
-  <section
-    id="formacoes"
-    class="q-py-md"
-  >
-    <div class="wrapper">
-      <!-- Cabeçalho -->
-      <div class="q-mb-xl">
-        <div class="text-overline text-primary text-weight-bold">
-          Formação acadêmica
-        </div>
-
-        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
-          Educação e aprendizado contínuo
-        </div>
-
-        <div class="text-body1 q-mt-md">
-          Minha trajetória reúne formação acadêmica, especializações,
-          bootcamps e cursos voltados ao desenvolvimento de software,
-          arquitetura, negócios e tecnologia.
-        </div>
-      </div>
-
-      <!-- Formações -->
-      <div
-        v-if="paginatedEducation.length"
-        class="row q-col-gutter-lg"
-      >
-        <q-intersection
-          v-for="education in paginatedEducation"
-          :key="education.id"
-          transition="scale"
-          class="education-intersection col-12 col-md-6 col-lg-4"
-        >
-          <q-card
-            flat
-            bordered
-            class="education-card full-height bg-transparent backdrop-blur"
-          >
-            <!-- Imagem -->
-            <button
-              v-if="getAsset(education.course)"
-              type="button"
-              class="education-image-button"
-              :aria-label="`Visualizar certificado de ${education.course}`"
-              @click="openImage(education.course)"
-            >
-              <q-img
-                :src="getAsset(education.course)?.image"
-                :alt="`${education.course} - ${getInstitution(
-                  education.course,
-                  education.institution,
-                )}`"
-                fit="cover"
-                class="education-image"
-              />
-
-              <div class="education-image-overlay">
-                <q-icon
-                  name="mdi-magnify-plus-outline"
-                  size="30px"
-                />
-
-                <span>Visualizar</span>
-              </div>
-            </button>
-
-            <div
-              v-else
-              class="education-image-placeholder flex flex-center"
-            >
-              <q-icon
-                name="mdi-school-outline"
-                size="64px"
-                color="primary"
-              />
-            </div>
-
-            <!-- Conteúdo -->
-            <q-card-section class="education-content">
-              <!-- Instituição -->
-              <div class="text-caption text-primary text-weight-bold">
-                {{
-                  getInstitution(
-                    education.course,
-                    education.institution,
-                  )
-                }}
-              </div>
-
-              <!-- Curso -->
-              <div class="text-h6 text-weight-bold q-mt-xs">
-                {{ education.course }}
-              </div>
-
-              <!-- Metadados -->
-              <div class="row items-center q-gutter-xs q-mt-md">
-                <q-badge
-                  outline
-                  color="primary"
-                  :label="getType(education.course)"
-                />
-
-                <q-badge
-                  v-if="getCategory(education.course)"
-                  outline
-                  color="primary"
-                  :label="getCategory(education.course)"
-                />
-              </div>
-            </q-card-section>
-
-            <!-- Ações -->
-            <q-separator />
-
-            <q-card-actions
-              class="justify-between q-px-md q-py-sm q-mb-md q-mt-md"
-            >
-              <div class="text-caption">
-                {{ getType(education.course) }}
-              </div>
-
-              <a
-                v-if="getAsset(education.course)?.pdf"
-                :href="getAsset(education.course)?.pdf"
-                :download="`${education.course}.pdf`"
-                class="education-download"
-              >
-                <q-icon
-                  name="mdi-file-download-outline"
-                  size="18px"
-                />
-
-                <span>Certificado</span>
-              </a>
-            </q-card-actions>
-          </q-card>
-        </q-intersection>
-      </div>
-
-      <!-- Sem formações -->
-      <q-card
-        v-else
-        flat
-        bordered
-      >
-        <q-card-section class="text-center q-pa-xl">
-          <q-icon
-            name="mdi-school-outline"
-            size="56px"
-            color="grey-5"
-          />
-
-          <div class="text-h6 q-mt-md">
-            Nenhuma formação cadastrada
-          </div>
-        </q-card-section>
-      </q-card>
-
-      <!-- Paginação -->
-      <div
-        v-if="totalPages > 1"
-        class="row justify-center q-mt-xl"
-      >
-        <q-pagination
-          v-model="currentPage"
-          :max="totalPages"
-          :max-pages="7"
-          boundary-numbers
-          direction-links
-          color="primary"
-        />
-      </div>
-    </div>
-
-    <!-- Preview do certificado -->
-    <q-dialog
-      v-model="previewDialog"
-      maximized
-      @hide="closeImage"
-    >
-      <q-card class="education-preview">
-        <q-bar class="education-preview-header">
-          <div class="ellipsis">
-            {{ previewTitle }}
-          </div>
-
-          <q-space />
-
-          <q-btn
-            flat
-            round
-            dense
-            icon="mdi-close"
-            aria-label="Fechar"
-            @click="closeImage"
-          />
-        </q-bar>
-
-        <q-card-section class="education-preview-content">
-          <q-img
-            v-if="previewImage"
-            :src="previewImage"
-            :alt="previewTitle"
-            fit="contain"
-            class="education-preview-image"
-          />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
-  </section>
-</template>
 
 <style scoped>
 .education-card {

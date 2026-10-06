@@ -1,3 +1,150 @@
+<template>
+  <section id="depoimentos" class="q-py-md">
+    <div class="wrapper">
+      <div class="testimonial-heading q-mb-xl">
+        <div class="text-overline text-primary text-weight-bold">Depoimentos</div>
+
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
+          O que dizem sobre meu trabalho
+        </div>
+
+        <div class="text-body1 q-mt-md">
+          Ao longo da minha trajetória profissional, tive a oportunidade de trabalhar com diferentes
+          equipes, projetos e desafios. Confira alguns depoimentos de pessoas com quem compartilhei
+          essa jornada.
+        </div>
+      </div>
+      <div
+        v-if="testimonials.length && activeTestimonial"
+        class="testimonials-showcase"
+        @mouseenter="pauseProgress"
+        @mouseleave="resumeProgress"
+      >
+        <div class="testimonial-people">
+          <TransitionGroup name="testimonial-person-list">
+            <button
+              v-for="{ testimonial, index } in visibleTestimonials"
+              :key="testimonial.id"
+              type="button"
+              class="testimonial-person"
+              :class="{
+                'testimonial-person-active': activeIndex === index,
+              }"
+              :aria-label="`Ver depoimento de ${testimonial.name}`"
+              :aria-current="activeIndex === index ? 'true' : undefined"
+              @click="selectTestimonial(index)"
+            >
+              <div class="testimonial-avatar-progress">
+                <svg class="testimonial-progress-ring" viewBox="0 0 100 100" aria-hidden="true">
+                  <circle class="testimonial-progress-track" cx="50" cy="50" r="46" />
+
+                  <circle
+                    v-if="activeIndex === index"
+                    class="testimonial-progress-value"
+                    cx="50"
+                    cy="50"
+                    r="46"
+                    :style="{
+                      strokeDashoffset: progressDashOffset,
+                    }"
+                  />
+                </svg>
+
+                <q-avatar size="64px" class="testimonial-person-avatar">
+                  <img
+                    v-if="getTestimonialAvatar(testimonial.avatarUrl)"
+                    :src="getTestimonialAvatar(testimonial.avatarUrl) ?? undefined"
+                    :alt="`Foto de ${testimonial.name}`"
+                  />
+
+                  <span v-else class="testimonial-initials">
+                    {{ getInitials(testimonial.name) }}
+                  </span>
+                </q-avatar>
+              </div>
+            </button>
+          </TransitionGroup>
+        </div>
+        <div class="testimonial-stage">
+          <Transition name="testimonial-change" mode="out-in">
+            <article :key="activeTestimonial.id" class="testimonial-active backdrop-blur">
+              <q-icon
+                name="mdi-format-quote-open"
+                size="42px"
+                color="primary"
+                class="testimonial-quote"
+              />
+
+              <blockquote class="testimonial-text">
+                {{ activeTestimonial.content }}
+              </blockquote>
+              <q-icon
+                name="mdi-format-quote-close"
+                size="42px"
+                color="primary"
+                class="testimonial-quote-close"
+              />
+
+              <div class="testimonial-footer">
+                <div>
+                  <div class="testimonial-active-name">
+                    {{ activeTestimonial.name }}
+                  </div>
+
+                  <div
+                    v-if="activeTestimonial.role || activeTestimonial.company"
+                    class="testimonial-active-meta"
+                  >
+                    <span v-if="activeTestimonial.role">
+                      {{ activeTestimonial.role }}
+                    </span>
+
+                    <span v-if="activeTestimonial.role && activeTestimonial.company"> · </span>
+
+                    <span v-if="activeTestimonial.company">
+                      {{ activeTestimonial.company }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </Transition>
+          <div v-if="testimonials.length > 1" class="testimonial-navigation">
+            <q-btn
+              round
+              flat
+              icon="mdi-chevron-left"
+              aria-label="Depoimento anterior"
+              @click="goToPreviousTestimonial"
+            />
+
+            <span class="testimonial-counter">
+              {{ String(activeIndex + 1).padStart(2, '0') }}
+
+              <span class="testimonial-counter-divider"> / </span>
+
+              {{ String(testimonials.length).padStart(2, '0') }}
+            </span>
+
+            <q-btn
+              round
+              flat
+              icon="mdi-chevron-right"
+              aria-label="Próximo depoimento"
+              @click="goToNextTestimonial"
+            />
+          </div>
+        </div>
+      </div>
+      <div v-else class="testimonial-empty">
+        <q-icon name="mdi-comment-quote-outline" size="48px" color="primary" />
+
+        <div class="text-body1 q-mt-md">Nenhum depoimento disponível.</div>
+      </div>
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -261,153 +408,6 @@ onBeforeUnmount(() => {
   stopAnimation()
 })
 </script>
-
-<template>
-  <section id="depoimentos" class="q-py-md">
-    <div class="wrapper">
-      <div class="testimonial-heading q-mb-xl">
-        <div class="text-overline text-primary text-weight-bold">Depoimentos</div>
-
-        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
-          O que dizem sobre meu trabalho
-        </div>
-
-        <div class="text-body1 q-mt-md">
-          Ao longo da minha trajetória profissional, tive a oportunidade de trabalhar com diferentes
-          equipes, projetos e desafios. Confira alguns depoimentos de pessoas com quem compartilhei
-          essa jornada.
-        </div>
-      </div>
-      <div
-        v-if="testimonials.length && activeTestimonial"
-        class="testimonials-showcase"
-        @mouseenter="pauseProgress"
-        @mouseleave="resumeProgress"
-      >
-        <div class="testimonial-people">
-          <TransitionGroup name="testimonial-person-list">
-            <button
-              v-for="{ testimonial, index } in visibleTestimonials"
-              :key="testimonial.id"
-              type="button"
-              class="testimonial-person"
-              :class="{
-                'testimonial-person-active': activeIndex === index,
-              }"
-              :aria-label="`Ver depoimento de ${testimonial.name}`"
-              :aria-current="activeIndex === index ? 'true' : undefined"
-              @click="selectTestimonial(index)"
-            >
-              <div class="testimonial-avatar-progress">
-                <svg class="testimonial-progress-ring" viewBox="0 0 100 100" aria-hidden="true">
-                  <circle class="testimonial-progress-track" cx="50" cy="50" r="46" />
-
-                  <circle
-                    v-if="activeIndex === index"
-                    class="testimonial-progress-value"
-                    cx="50"
-                    cy="50"
-                    r="46"
-                    :style="{
-                      strokeDashoffset: progressDashOffset,
-                    }"
-                  />
-                </svg>
-
-                <q-avatar size="64px" class="testimonial-person-avatar">
-                  <img
-                    v-if="getTestimonialAvatar(testimonial.avatarUrl)"
-                    :src="getTestimonialAvatar(testimonial.avatarUrl) ?? undefined"
-                    :alt="`Foto de ${testimonial.name}`"
-                  />
-
-                  <span v-else class="testimonial-initials">
-                    {{ getInitials(testimonial.name) }}
-                  </span>
-                </q-avatar>
-              </div>
-            </button>
-          </TransitionGroup>
-        </div>
-        <div class="testimonial-stage">
-          <Transition name="testimonial-change" mode="out-in">
-            <article :key="activeTestimonial.id" class="testimonial-active backdrop-blur">
-              <q-icon
-                name="mdi-format-quote-open"
-                size="42px"
-                color="primary"
-                class="testimonial-quote"
-              />
-
-              <blockquote class="testimonial-text">
-                {{ activeTestimonial.content }}
-              </blockquote>
-              <q-icon
-                name="mdi-format-quote-close"
-                size="42px"
-                color="primary"
-                class="testimonial-quote-close"
-              />
-
-              <div class="testimonial-footer">
-                <div>
-                  <div class="testimonial-active-name">
-                    {{ activeTestimonial.name }}
-                  </div>
-
-                  <div
-                    v-if="activeTestimonial.role || activeTestimonial.company"
-                    class="testimonial-active-meta"
-                  >
-                    <span v-if="activeTestimonial.role">
-                      {{ activeTestimonial.role }}
-                    </span>
-
-                    <span v-if="activeTestimonial.role && activeTestimonial.company"> · </span>
-
-                    <span v-if="activeTestimonial.company">
-                      {{ activeTestimonial.company }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </Transition>
-          <div v-if="testimonials.length > 1" class="testimonial-navigation">
-            <q-btn
-              round
-              flat
-              icon="mdi-chevron-left"
-              aria-label="Depoimento anterior"
-              @click="goToPreviousTestimonial"
-            />
-
-            <span class="testimonial-counter">
-              {{ String(activeIndex + 1).padStart(2, '0') }}
-
-              <span class="testimonial-counter-divider"> / </span>
-
-              {{ String(testimonials.length).padStart(2, '0') }}
-            </span>
-
-            <q-btn
-              round
-              flat
-              icon="mdi-chevron-right"
-              aria-label="Próximo depoimento"
-              @click="goToNextTestimonial"
-            />
-          </div>
-        </div>
-      </div>
-      <div v-else class="testimonial-empty">
-        <q-icon name="mdi-comment-quote-outline" size="48px" color="primary" />
-
-        <div class="text-body1 q-mt-md">Nenhum depoimento disponível.</div>
-      </div>
-    </div>
-  </section>
-</template>
 
 <style scoped>
 .testimonial-heading {

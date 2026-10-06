@@ -1,3 +1,43 @@
+<template>
+  <section id="experiencia" class="q-py-md">
+    <div class="wrapper">
+      <!-- Cabeçalho -->
+      <div class="q-mb-xl">
+        <div class="text-overline text-primary text-weight-bold">Minha trajetória</div>
+
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
+          Experiência profissional
+        </div>
+
+        <div class="text-body1 q-mt-md">
+          Uma trajetória construída através de diferentes desafios, produtos e experiências de
+          desenvolvimento.
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <q-timeline :layout="layout" color="primary">
+        <ExperienceCard
+          v-for="experience in visibleExperiences"
+          :key="experience.id"
+          :experience="experience"
+        />
+      </q-timeline>
+
+      <div class="text-center q-mt-xl">
+        <q-btn
+          v-if="sortedExperiences.length > INITIAL_COUNT"
+          outline
+          color="primary"
+          :label="expanded ? 'Ver menos' : 'Ver mais'"
+          :icon-right="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+          @click="expanded = !expanded"
+        />
+      </div>
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
@@ -43,51 +83,3 @@ onMounted(() => {
   isHydrated.value = true
 })
 </script>
-
-<template>
-  <section
-    id="experiencia"
-    class="q-py-md"
-  >
-    <div class="wrapper">
-      <!-- Cabeçalho -->
-      <div class="q-mb-xl">
-        <div class="text-overline text-primary text-weight-bold">
-          Minha trajetória
-        </div>
-
-        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
-          Experiência profissional
-        </div>
-
-        <div class="text-body1 q-mt-md">
-          Uma trajetória construída através de diferentes desafios,
-          produtos e experiências de desenvolvimento.
-        </div>
-      </div>
-
-      <!-- Timeline -->
-      <q-timeline
-        :layout="layout"
-        color="primary"
-      >
-        <ExperienceCard
-          v-for="experience in visibleExperiences"
-          :key="experience.id"
-          :experience="experience"
-        />
-      </q-timeline>
-
-      <div class="text-center q-mt-xl">
-        <q-btn
-          v-if="sortedExperiences.length > INITIAL_COUNT"
-          outline
-          color="primary"
-          :label="expanded ? 'Ver menos' : 'Ver mais'"
-          :icon-right="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-          @click="expanded = !expanded"
-        />
-      </div>
-    </div>
-  </section>
-</template>

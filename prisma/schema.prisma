@@ -25,6 +25,27 @@ model Profile {
   socialLinks    SocialLink[]
 }
 
+model Project {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  category     String?
+  subtitle     String?
+  description  String   @db.Text
+  icon         String?
+  image        String
+  previewGif   String?
+  technologies String[] @default([])
+  url          String?
+  github       String?
+  sortOrder    Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isPublished, sortOrder])
+}
+
 model Experience {
   id          String    @id @default(cuid())
   profileId   String

@@ -14,41 +14,70 @@
         </p>
       </div>
 
-      <div class="row q-col-gutter-lg gt-xs">
-        <div v-for="project in projects" :key="project.name" class="col-12 col-md-6">
-          <q-card bordered flat class="full-height bg-transparent backdrop-blur">
+      <q-banner v-if="projectsError" class="bg-negative text-white q-mb-md" rounded>
+        Não foi possível carregar os projetos. {{ projectsError.message }}
+      </q-banner>
+
+      <div v-else-if="projectsPending" class="row justify-center q-pa-xl">
+        <q-spinner color="primary" size="40px" aria-label="Carregando projetos" />
+      </div>
+
+      <div v-else-if="!projects.length" class="text-body1 q-py-lg">
+        Nenhum projeto publicado no momento.
+      </div>
+
+      <div v-else class="row q-col-gutter-md">
+        <div
+          v-for="(project, index) in paginatedProjects"
+          :key="project.id"
+          class="col-12 col-sm-6 col-lg-4"
+        >
+          <q-card
+            bordered
+            flat
+            clickable
+            role="button"
+            :aria-label="`Ver detalhes de ${project.name || `projeto ${(currentPage - 1) * projectsPerPage + index + 1}`}`"
+            class="full-height bg-transparent backdrop-blur project-card"
+            @click="openProject(project)"
+            @keyup.enter="openProject(project)"
+            @keyup.space.prevent="openProject(project)"
+          >
             <q-img
-              :src="project.image"
-              :alt="`Overview do projeto ${project.name}`"
+              :src="resolveProjectAsset(project.image)"
+              :alt="`Prévia do projeto ${project.name || 'em breve'}`"
               width="100%"
-              height="50%"
+              height="200px"
               fit="cover"
             />
 
-            <q-card-section class="text-white q-pa-lg">
-              <div class="text-caption text-grey-4">
+            <q-card-section class="text-white q-pa-md">
+              <div v-if="project.category" class="text-caption text-grey-4">
                 {{ project.category }}
               </div>
 
-              <div class="text-h5 text-weight-bold q-mt-xs">
-                {{ project.name }}
-              </div>
-            </q-card-section>
-
-            <q-separator color="grey-8" />
-
-            <q-card-section class="column full-height q-pa-lg">
-              <div>
-                <p class="text-primary text-weight-medium q-mt-sm q-mb-none">
-                  {{ project.subtitle }}
-                </p>
-
-                <p class="text-body2 q-mt-md q-mb-none">
-                  {{ project.description }}
-                </p>
+              <div class="row items-center no-wrap q-gutter-sm q-mt-xs">
+                <q-icon
+                  v-if="project.icon"
+                  :name="project.icon"
+                  size="24px"
+                  color="primary"
+                  aria-hidden="true"
+                />
+                <div class="text-h6 text-weight-bold">
+                  {{ project.name || 'Projeto em breve' }}
+                </div>
               </div>
 
-              <div class="row q-gutter-sm q-mt-xs" aria-label="Tecnologias utilizadas">
+              <p v-if="project.subtitle" class="text-primary text-weight-medium q-mt-sm q-mb-none">
+                {{ project.subtitle }}
+              </p>
+
+              <div
+                v-if="project.technologies.length"
+                class="row q-gutter-sm q-mt-md"
+                aria-label="Tecnologias utilizadas"
+              >
                 <q-badge
                   v-for="technology in project.technologies"
                   :key="technology"
@@ -56,29 +85,6 @@
                   outline
                   :label="technology"
                   class="text-body2"
-                />
-              </div>
-
-              <div class="row items-center q-gutter-sm q-mt-auto">
-                <q-btn
-                  v-if="project.url"
-                  :href="project.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  color="primary"
-                  icon-right="mdi-arrow-top-right"
-                  label="Ver projeto"
-                />
-
-                <q-btn
-                  v-if="project.github"
-                  :href="project.github"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  flat
-                  color="primary"
-                  icon="mdi-github"
-                  aria-label="Ver projeto no GitHub"
                 />
               </div>
             </q-card-section>
@@ -86,161 +92,66 @@
         </div>
       </div>
 
-      <q-carousel
-        v-if="isMobile"
-        v-model="activeProject"
-        class="bg-transparent backdrop-blur"
-        animated
-        navigation
-        swipeable
-        control-color="primary"
-        height="720px"
-      >
-        <q-carousel-slide
-          v-for="(project, index) in projects"
-          :key="project.name"
-          :name="index"
-          class="q-pa-none"
-        >
-          <q-card bordered flat class="full-height bg-transparent backdrop-blur">
-            <q-img :src="project.image" :alt="`Overview do projeto ${project.name}`" fit="cover" />
+      <div v-if="!projectsError && totalPages > 1" class="row justify-center q-mt-xl">
+        <q-pagination
+          v-model="currentPage"
+          :max="totalPages"
+          :max-pages="5"
+          boundary-numbers
+          direction-links
+          color="primary"
+          aria-label="Paginação dos projetos"
+        />
+      </div>
 
-            <q-card-section class="text-white q-pa-lg">
-              <div class="text-caption text-grey-4">
-                {{ project.category }}
-              </div>
-
-              <div class="text-h5 text-weight-bold q-mt-xs">
-                {{ project.name }}
-              </div>
-            </q-card-section>
-
-            <q-separator color="grey-8" />
-
-            <q-card-section class="column q-pa-lg">
-              <p class="text-primary text-weight-medium q-mt-sm q-mb-none">
-                {{ project.subtitle }}
-              </p>
-
-              <p class="text-body2 q-mt-md q-mb-none">
-                {{ project.description }}
-              </p>
-
-              <div class="row q-gutter-sm q-mt-lg" aria-label="Tecnologias utilizadas">
-                <q-badge
-                  v-for="technology in project.technologies"
-                  :key="technology"
-                  color="primary"
-                  outline
-                  :label="technology"
-                  class="text-body2"
-                />
-              </div>
-
-              <div class="row items-center q-gutter-sm q-mt-lg">
-                <q-btn
-                  v-if="project.url"
-                  :href="project.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  color="primary"
-                  icon-right="mdi-arrow-top-right"
-                  label="Ver projeto"
-                />
-
-                <q-btn
-                  v-if="project.github"
-                  :href="project.github"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  flat
-                  color="primary"
-                  icon="mdi-github"
-                  aria-label="Ver projeto no GitHub"
-                />
-              </div>
-            </q-card-section>
-          </q-card>
-        </q-carousel-slide>
-      </q-carousel>
+      <ProjectsCard v-model="isProjectCardOpen" :project="selectedProject" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import agendaAI from '../../assets/images/agenda.png'
-import fieldActivity from '../../assets/images/field.png'
-import gdxEnergia from '../../assets/images/gdx.png'
-import desmentiApp from '../../assets/images/desmenti.png'
+import { computed, ref } from 'vue'
+import ProjectsCard from './ProjectsCard.vue'
+import type { ProjectRecord } from '#shared/types/project'
+import { resolveProjectAsset } from '~/utils/global'
 
-interface Project {
-  name: string
-  category: string
-  subtitle: string
-  description: string
-  icon: string
-  image: string
-  technologies: string[]
-  url?: string
-  github?: string
+const projectsPerPage = 3
+const currentPage = ref(1)
+const selectedProject = ref<ProjectRecord | null>(null)
+const isProjectCardOpen = ref(false)
+
+const {
+  data: projectsData,
+  error: projectsError,
+  pending: projectsPending,
+} = await useFetch<ProjectRecord[]>('/api/projects', {
+  key: 'projects',
+  server: true,
+})
+
+const projects = computed(() => projectsData.value ?? [])
+const totalPages = computed(() => Math.ceil(projects.value.length / projectsPerPage))
+const paginatedProjects = computed(() => {
+  const start = (currentPage.value - 1) * projectsPerPage
+  return projects.value.slice(start, start + projectsPerPage)
+})
+
+function openProject(project: ProjectRecord) {
+  selectedProject.value = project
+  isProjectCardOpen.value = true
+}
+</script>
+
+<style scoped>
+.project-card {
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
 }
 
-const activeProject = ref(0)
-const { isMobile } = useMobile()
-
-const projects: Project[] = [
-  {
-    name: 'AgendaAI',
-    category: 'SaaS · Multi-tenant',
-    subtitle: 'Gestão de agendamentos para negócios de serviços',
-    description:
-      'Plataforma desenvolvida para centralizar a operação de barbearias e negócios de serviços, com organizações, unidades, profissionais, serviços e agendamentos.',
-    icon: 'mdi-calendar-clock',
-    image: agendaAI,
-    technologies: ['Nuxt', 'NestJS', 'Prisma', 'PostgreSQL'],
-  },
-  {
-    name: 'Field Activity',
-    category: 'Gestão · Operação',
-    subtitle: 'Plataforma para gestão de atividades em campo',
-    description:
-      'Solução desenvolvida para registrar e acompanhar atividades realizadas em campo, utilizando geolocalização, validações e evidências fotográficas.',
-    icon: 'mdi-map-marker-radius',
-    image: fieldActivity,
-    technologies: ['Vue 3', 'Quasar', 'NestJS', 'Prisma', 'PostgreSQL'],
-  },
-  {
-    name: 'GDX Energia',
-    category: 'Web · Performance · SEO',
-    subtitle: 'Modernização da experiência digital',
-    description:
-      'Projeto de modernização da aplicação com foco em experiência do usuário, responsividade, performance, organização do frontend e otimização para mecanismos de busca.',
-    icon: 'mdi-lightning-bolt',
-    image: gdxEnergia,
-    technologies: ['Vue 3', 'Quasar', 'Vite', 'SEO'],
-  },
-  {
-    name: 'Desmenti App',
-    category: 'Mobile · Social',
-    subtitle: 'Aplicativo para verificação de fatos',
-    description:
-      'Aplicativo desenvolvido para permitir que os usuários verifiquem a veracidade de informações e notícias, promovendo a disseminação de conteúdo confiável.',
-    icon: 'mdi-new-box',
-    image: desmentiApp,
-    technologies: [
-      'React',
-      'TypeScript',
-      'ShadCN/UI',
-      'Radix UI',
-      'TailwindCSS',
-      'Python',
-      'Flask',
-      'pytest',
-      'Redis',
-      'PostgreSQL',
-      'docker',
-    ],
-  },
-]
-</script>
+.project-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--q-primary);
+}
+</style>

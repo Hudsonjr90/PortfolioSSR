@@ -29,6 +29,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     betterAuthSecret: process.env.BETTER_AUTH_SECRET || '',
     databaseUrl: process.env.DATABASE_URL || '',
+    devAdminPassword: process.env.DEV_ADMIN_PASSWORD || '',
     resendApiKey: process.env.RESEND_API_KEY || '',
 
     public: {

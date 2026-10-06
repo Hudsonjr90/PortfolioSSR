@@ -1,5 +1,47 @@
-<script setup lang="ts">
+<template>
+  <q-timeline-entry
+    :title="experience.role"
+    :subtitle="`${formatDate(experience.startDate)} — ${
+      experience.isCurrent ? 'Atual' : formatDate(experience.endDate)
+    }`"
+    :icon="
+      getLogo(experience.company) ? `img:${getLogo(experience.company)}` : 'mdi-briefcase-outline'
+    "
+    color="primary"
+  >
+    <!-- Empresa -->
+    <div class="q-mb-md">
+      <div class="text-h6 text-weight-bold">
+        {{ experience.company }}
+      </div>
 
+      <div class="text-caption">
+        {{ experience.isCurrent ? 'Experiência atual' : 'Experiência profissional' }}
+      </div>
+    </div>
+
+    <!-- Descrição -->
+    <div class="text-body1 experience-description">
+      {{ experience.description }}
+    </div>
+
+    <!-- Tecnologias -->
+    <div v-if="experience.technologies?.length" class="row q-gutter-xs q-mt-lg">
+      <q-badge
+        v-for="technology in experience.technologies"
+        :key="technology.id"
+        dense
+        outline
+        color="primary"
+        class="technology-chip q-px-md q-py-sm"
+      >
+        {{ technology.name }}
+      </q-badge>
+    </div>
+  </q-timeline-entry>
+</template>
+
+<script setup lang="ts">
 defineProps<{
   experience: {
     id: string
@@ -32,7 +74,6 @@ const experienceLogos: Record<string, string> = {
   afilio: '/images/experiences/afilio.png',
 }
 
-
 function normalizeCompanyName(company: string) {
   return company
     .normalize('NFD')
@@ -41,7 +82,6 @@ function normalizeCompanyName(company: string) {
     .replace(/[^a-z0-9]/g, '')
 }
 
-
 function getLogo(company: string) {
   const normalizedCompany = normalizeCompanyName(company)
 
@@ -49,9 +89,7 @@ function getLogo(company: string) {
     return experienceLogos[normalizedCompany]
   }
 
-  const match = Object.entries(experienceLogos).find(([key]) =>
-    normalizedCompany.includes(key),
-  )
+  const match = Object.entries(experienceLogos).find(([key]) => normalizedCompany.includes(key))
 
   return match ? match[1] : null
 }
@@ -68,58 +106,6 @@ function formatDate(date: string | null) {
 }
 </script>
 
-<template>
-  <q-timeline-entry
-    :title="experience.role"
-    :subtitle="`${formatDate(experience.startDate)} — ${
-      experience.isCurrent ? 'Atual' : formatDate(experience.endDate)
-    }`"
-    :icon="
-      getLogo(experience.company)
-        ? `img:${getLogo(experience.company)}`
-        : 'mdi-briefcase-outline'
-    "
-    color="primary"
-  >
-    <!-- Empresa -->
-    <div class="q-mb-md">
-      <div class="text-h6 text-weight-bold">
-        {{ experience.company }}
-      </div>
-
-      <div class="text-caption">
-        {{
-          experience.isCurrent
-            ? 'Experiência atual'
-            : 'Experiência profissional'
-        }}
-      </div>
-    </div>
-
-    <!-- Descrição -->
-    <div class="text-body1 experience-description">
-      {{ experience.description }}
-    </div>
-
-    <!-- Tecnologias -->
-    <div
-      v-if="experience.technologies?.length"
-      class="row q-gutter-xs q-mt-lg"
-    >
-      <q-badge
-        v-for="technology in experience.technologies"
-        :key="technology.id"
-        dense
-        outline
-        color="primary"
-        class="technology-chip q-px-md q-py-sm"
-      >
-        {{ technology.name }}
-      </q-badge>
-    </div>
-  </q-timeline-entry>
-</template>
-
 <style scoped>
 .experience-description {
   line-height: 1.7;
@@ -134,5 +120,4 @@ function formatDate(date: string | null) {
   height: 40px !important;
   object-fit: contain;
 }
-
 </style>

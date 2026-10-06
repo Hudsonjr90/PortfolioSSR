@@ -106,6 +106,142 @@ const technologies: Array<{
   { name: "Go", category: TechnologyCategory.BACKEND, icon: "Go", sortOrder: 94, featured: false, level: TechnologyLevel.BASIC },
 ];
 
+const portfolioProjects = [
+  {
+    slug: "agenda-ai",
+    name: "AgendaAI",
+    category: "SaaS · Multi-tenant · Mobile · Web",
+    subtitle: "Gestão de agendamentos para negócios de serviços",
+    description:
+      "Plataforma desenvolvida para centralizar a operação de barbearias e negócios de serviços, com organizações, unidades, profissionais, serviços e agendamentos.",
+    icon: "mdi-calendar-clock",
+    image: "agenda.png",
+    technologies: ["Nuxt", "NestJS", "Prisma", "PostgreSQL"],
+    sortOrder: 0,
+  },
+  {
+    slug: "field-activity",
+    name: "Field Activity",
+    category: "Gestão · Operação · Mobile · Web",
+    subtitle: "Plataforma para gestão de atividades em campo",
+    description:
+      "Solução desenvolvida para registrar e acompanhar atividades realizadas em campo, utilizando geolocalização, validações e evidências fotográficas.",
+    icon: "mdi-map-marker-radius",
+    image: "field.png",
+    technologies: ["Vue 3", "Quasar", "NestJS", "Prisma", "PostgreSQL"],
+    sortOrder: 1,
+  },
+  {
+    slug: "gdx-energia",
+    name: "GDX Energia",
+    category: "Performance · SEO · Mobile · Web",
+    subtitle: "Modernização da experiência digital",
+    description:
+      "Projeto de modernização da aplicação com foco em experiência do usuário, responsividade, performance, organização do frontend e otimização para mecanismos de busca.",
+    icon: "mdi-lightning-bolt",
+    image: "gdx.png",
+    technologies: ["Vue 3", "Quasar", "Vite", "SEO"],
+    sortOrder: 2,
+  },
+  {
+    slug: "desmenti-app",
+    name: "Desmenti App",
+    category: "Social · Mobile · Web",
+    subtitle: "Aplicativo para verificação de fatos",
+    description:
+      "Aplicativo desenvolvido para permitir que os usuários verifiquem a veracidade de informações e notícias, promovendo a disseminação de conteúdo confiável.",
+    icon: "mdi-new-box",
+    image: "desmenti.png",
+    technologies: [
+      "React",
+      "TypeScript",
+      "ShadCN/UI",
+      "Radix UI",
+      "TailwindCSS",
+      "Python",
+      "Flask",
+      "pytest",
+      "Redis",
+      "PostgreSQL",
+      "docker",
+    ],
+    sortOrder: 3,
+  },
+  {
+    slug: "controle-financeiro",
+    name: "Controle Financeiro",
+    category: "Gestão Financeira · Mobile · Web",
+    subtitle: "Sistema simples para controle de gastos.",
+    description:
+      "Aplicação para registrar gastos e acompanhar as finanças do dia a dia, com foco em tornar o controle financeiro simples e acessível.",
+    icon: "mdi-wallet-outline",
+    image: "control.png",
+    technologies: ["Nuxt", "Vue 3", "TypeScript", "Quasar Framework", "Sass/Scss", "Vite"],
+    sortOrder: 4,
+  },
+  {
+    slug: "credit-card-form",
+    name: "Credit Card Form",
+    category: "Formulário · Mobile · Web",
+    subtitle: "Formulário componentizável de cartão de crédito.",
+    description:
+      "Componente de formulário para dados de cartão de crédito, com uma interface organizada e adaptável a diferentes tamanhos de tela.",
+    icon: "mdi-credit-card-outline",
+    image: "credit.png",
+    technologies: ["VueJs", "JavaScript", "CSS3"],
+    sortOrder: 5,
+  },
+  {
+    slug: "flappy-bird-remake",
+    name: "Flappy Bird Remake",
+    category: "Mobile · Web · Game",
+    subtitle: "Jogo recriado para praticar os eventos em javascript",
+    description:
+      "Recriação do Flappy Bird para praticar eventos em JavaScript, controles do jogo e atualização da interface durante a partida.",
+    icon: "mdi-gamepad-variant-outline",
+    image: "flappy.png",
+    technologies: ["HTML5", "CSS3", "JavaScript"],
+    sortOrder: 6,
+  },
+  {
+    slug: "jogo-da-memoria",
+    name: "Jogo da memória",
+    category: "Mobile · Web · Game",
+    subtitle: "Jogo feito em vue com o intuito de praticar o quasar framework",
+    description:
+      "Jogo da memória desenvolvido com Vue e Quasar para praticar componentes, estado da aplicação e interações com o usuário.",
+    icon: "mdi-cards-playing-outline",
+    image: "memory.png",
+    technologies: ["Vue 3", "TypeScript", "Quasar Framework", "Vite"],
+    sortOrder: 7,
+  },
+  {
+    slug: "pacman-remake",
+    name: "Pacman Remake",
+    category: "Mobile · Web · Game",
+    subtitle:
+      "Trabalho feito na faculdade de ciência da computação, para treinar engenharia reversa.",
+    description:
+      "Recriação do Pac-Man desenvolvida como trabalho da faculdade, explorando engenharia reversa e a implementação de mecânicas de jogo.",
+    icon: "mdi-ghost-outline",
+    image: "pacman.png",
+    technologies: ["JavaScript", "Jquery", "Python", "HTML5", "CSS3"],
+    sortOrder: 8,
+  },
+  {
+    slug: "pokedex-3d-card",
+    name: "Pokedex 3D Card",
+    category: "Mobile · Web",
+    subtitle: "Pokedex feita com Nuxt e tailwind para extrair o poder do framework.",
+    description:
+      "Pokédex feita com Nuxt e Tailwind CSS, com cards 3D para apresentar informações de Pokémon e explorar recursos do framework.",
+    icon: "mdi-pokeball",
+    image: "pokenuxt.png",
+    technologies: ["Nuxt", "Vue 3", "TypeScript", "Tailwind CSS", "SCSS", "API REST"],
+    sortOrder: 9,
+  },
+];
+
 async function main() {
   console.log("🌱 Starting technology seed...");
   console.log(`⚙️ Synchronizing ${technologies.length} technologies...`);
@@ -144,6 +280,11 @@ async function main() {
   console.log(`   Created: ${created}`);
   console.log(`   Updated: ${updated}`);
   console.log(`   Total:   ${technologies.length}`);
+  const projects = await prisma.project.createMany({
+    data: portfolioProjects,
+    skipDuplicates: true,
+  });
+  console.log(`   Projects created: ${projects.count}`);
   console.log("\n✅ Technology seed completed successfully.");
 }
 

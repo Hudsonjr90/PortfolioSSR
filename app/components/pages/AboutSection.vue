@@ -1,135 +1,3 @@
-<script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue'
-import profileImage from '~/assets/images/profile/my.webp'
-
-const { data: portfolio, pending, error } = usePortfolio()
-
-const { isMobile } = useMobile()
-const { isDark } = useTheme()
-
-const activePrinciple = ref('0')
-const isAboutExpanded = ref(false)
-const pixelCanvas = ref<HTMLCanvasElement | null>(null)
-
-let pixelEffectImage: HTMLImageElement | null = null
-
-function getPixelEffectImage() {
-  if (pixelEffectImage) return pixelEffectImage
-
-  pixelEffectImage = new Image()
-  pixelEffectImage.src = profileImage
-  return pixelEffectImage
-}
-
-function drawPixelEffect() {
-  const canvas = pixelCanvas.value
-  if (!canvas) return
-
-  const size = canvas.clientWidth
-  if (!size) return
-
-  const image = getPixelEffectImage()
-  if (!image.complete) {
-    image.addEventListener('load', drawPixelEffect, { once: true })
-    return
-  }
-
-  const pixelRatio = window.devicePixelRatio || 1
-  const gridSize = 52
-  const pixelSize = size / gridSize
-  const sourceSize = Math.min(image.naturalWidth, image.naturalHeight)
-  const sourceX = (image.naturalWidth - sourceSize) / 2
-  const sourceY = (image.naturalHeight - sourceSize) / 2
-  const buffer = document.createElement('canvas')
-  const bufferContext = buffer.getContext('2d', { willReadFrequently: true })
-  const context = canvas.getContext('2d')
-
-  if (!bufferContext || !context) return
-
-  canvas.width = Math.round(size * pixelRatio)
-  canvas.height = Math.round(size * pixelRatio)
-  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
-
-  buffer.width = gridSize
-  buffer.height = gridSize
-  bufferContext.imageSmoothingEnabled = false
-  bufferContext.drawImage(
-    image,
-    sourceX,
-    sourceY,
-    sourceSize,
-    sourceSize,
-    0,
-    0,
-    gridSize,
-    gridSize,
-  )
-
-  const pixels = bufferContext.getImageData(0, 0, gridSize, gridSize).data
-  context.fillStyle = '#050505'
-  context.fillRect(0, 0, size, size)
-
-  for (let y = 0; y < gridSize; y += 1) {
-    for (let x = 0; x < gridSize; x += 1) {
-      const noise = Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1
-      if (noise < 0.22) continue
-
-      const index = (y * gridSize + x) * 4
-      context.fillStyle = `rgb(${pixels[index]}, ${pixels[index + 1]}, ${pixels[index + 2]})`
-      context.fillRect(x * pixelSize + 0.75, y * pixelSize + 0.75, pixelSize - 1.5, pixelSize - 1.5)
-    }
-  }
-}
-
-function clearPixelEffect() {
-  const canvas = pixelCanvas.value
-  const context = canvas?.getContext('2d')
-
-  if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height)
-}
-
-onBeforeUnmount(clearPixelEffect)
-
-const principles = [
-  {
-    title: 'Arquitetura & Escalabilidade',
-    description:
-      'Estruturo soluções pensando em crescimento, manutenção e evolução contínua do produto.',
-    icon: 'mdi-layers-outline',
-  },
-  {
-    title: 'Performance & Qualidade',
-    description:
-      'Busco código eficiente, consultas otimizadas e experiências rápidas e consistentes.',
-    icon: 'mdi-speedometer',
-  },
-  {
-    title: 'Segurança & Boas Práticas',
-    description:
-      'Aplico princípios de segurança, organização e padrões que tornam o software mais confiável.',
-    icon: 'mdi-shield-check-outline',
-  },
-  {
-    title: 'Experiência do Usuário',
-    description:
-      'Transformo requisitos em interfaces claras, acessíveis e focadas nas necessidades de quem utiliza o produto.',
-    icon: 'mdi-account-heart-outline',
-  },
-  {
-    title: 'Código Sustentável',
-    description:
-      'Prioritizo código legível, organizado e preparado para manutenção, testes e evolução do sistema.',
-    icon: 'mdi-code-braces',
-  },
-  {
-    title: 'Evolução Contínua',
-    description:
-      'Mantenho uma postura de aprendizado constante, acompanhando tecnologias e práticas que agregam valor.',
-    icon: 'mdi-trending-up',
-  },
-]
-</script>
-
 <template>
   <section id="sobre" class="q-py-xl" aria-labelledby="about-title">
     <div class="wrapper">
@@ -219,7 +87,7 @@ const principles = [
                 </q-list>
               </q-btn-dropdown>
 
-              <social-links-fab direction="right" class="about-actions__social"/>
+              <SocialLinksFab direction="right" class="about-actions__social" />
             </div>
           </div>
 
@@ -248,7 +116,11 @@ const principles = [
                   loading="eager"
                 />
 
-                <canvas ref="pixelCanvas" class="profile-avatar__pixelated" aria-hidden="true"></canvas>
+                <canvas
+                  ref="pixelCanvas"
+                  class="profile-avatar__pixelated"
+                  aria-hidden="true"
+                ></canvas>
               </div>
             </div>
           </div>
@@ -372,6 +244,129 @@ const principles = [
   </section>
 </template>
 
+<script setup lang="ts">
+import { onBeforeUnmount, ref } from 'vue'
+import profileImage from '~/assets/images/profile/my.webp'
+
+
+const { data: portfolio, pending, error } = usePortfolio()
+
+const { isMobile } = useMobile()
+const { isDark } = useTheme()
+
+const activePrinciple = ref('0')
+const isAboutExpanded = ref(false)
+const pixelCanvas = ref<HTMLCanvasElement | null>(null)
+
+let pixelEffectImage: HTMLImageElement | null = null
+
+function getPixelEffectImage() {
+  if (pixelEffectImage) return pixelEffectImage
+
+  pixelEffectImage = new Image()
+  pixelEffectImage.src = profileImage
+  return pixelEffectImage
+}
+
+function drawPixelEffect() {
+  const canvas = pixelCanvas.value
+  if (!canvas) return
+
+  const size = canvas.clientWidth
+  if (!size) return
+
+  const image = getPixelEffectImage()
+  if (!image.complete) {
+    image.addEventListener('load', drawPixelEffect, { once: true })
+    return
+  }
+
+  const pixelRatio = window.devicePixelRatio || 1
+  const gridSize = 52
+  const pixelSize = size / gridSize
+  const sourceSize = Math.min(image.naturalWidth, image.naturalHeight)
+  const sourceX = (image.naturalWidth - sourceSize) / 2
+  const sourceY = (image.naturalHeight - sourceSize) / 2
+  const buffer = document.createElement('canvas')
+  const bufferContext = buffer.getContext('2d', { willReadFrequently: true })
+  const context = canvas.getContext('2d')
+
+  if (!bufferContext || !context) return
+
+  canvas.width = Math.round(size * pixelRatio)
+  canvas.height = Math.round(size * pixelRatio)
+  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+
+  buffer.width = gridSize
+  buffer.height = gridSize
+  bufferContext.imageSmoothingEnabled = false
+  bufferContext.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, gridSize, gridSize)
+
+  const pixels = bufferContext.getImageData(0, 0, gridSize, gridSize).data
+  context.fillStyle = '#050505'
+  context.fillRect(0, 0, size, size)
+
+  for (let y = 0; y < gridSize; y += 1) {
+    for (let x = 0; x < gridSize; x += 1) {
+      const noise = Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1
+      if (noise < 0.22) continue
+
+      const index = (y * gridSize + x) * 4
+      context.fillStyle = `rgb(${pixels[index]}, ${pixels[index + 1]}, ${pixels[index + 2]})`
+      context.fillRect(x * pixelSize + 0.75, y * pixelSize + 0.75, pixelSize - 1.5, pixelSize - 1.5)
+    }
+  }
+}
+
+function clearPixelEffect() {
+  const canvas = pixelCanvas.value
+  const context = canvas?.getContext('2d')
+
+  if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height)
+}
+
+onBeforeUnmount(clearPixelEffect)
+
+const principles = [
+  {
+    title: 'Arquitetura & Escalabilidade',
+    description:
+      'Estruturo soluções pensando em crescimento, manutenção e evolução contínua do produto.',
+    icon: 'mdi-layers-outline',
+  },
+  {
+    title: 'Performance & Qualidade',
+    description:
+      'Busco código eficiente, consultas otimizadas e experiências rápidas e consistentes.',
+    icon: 'mdi-speedometer',
+  },
+  {
+    title: 'Segurança & Boas Práticas',
+    description:
+      'Aplico princípios de segurança, organização e padrões que tornam o software mais confiável.',
+    icon: 'mdi-shield-check-outline',
+  },
+  {
+    title: 'Experiência do Usuário',
+    description:
+      'Transformo requisitos em interfaces claras, acessíveis e focadas nas necessidades de quem utiliza o produto.',
+    icon: 'mdi-account-heart-outline',
+  },
+  {
+    title: 'Código Sustentável',
+    description:
+      'Prioritizo código legível, organizado e preparado para manutenção, testes e evolução do sistema.',
+    icon: 'mdi-code-braces',
+  },
+  {
+    title: 'Evolução Contínua',
+    description:
+      'Mantenho uma postura de aprendizado constante, acompanhando tecnologias e práticas que agregam valor.',
+    icon: 'mdi-trending-up',
+  },
+]
+</script>
+
 <style>
 /* =========================================================
    SOBRE MIM
@@ -392,8 +387,6 @@ const principles = [
   margin: 0;
   line-height: 1.8;
 }
-
-
 
 /* =========================================================
    PRINCÍPIOS
@@ -814,7 +807,7 @@ Mobile Styles
     -webkit-line-clamp: 5;
   }
 
-    .profile-avatar {
+  .profile-avatar {
     --avatar-size: 205px;
 
     position: relative;
@@ -841,5 +834,4 @@ Mobile Styles
     width: 100%;
   }
 }
-
 </style>

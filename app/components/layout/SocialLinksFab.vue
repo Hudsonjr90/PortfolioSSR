@@ -1,57 +1,3 @@
-<script setup lang="ts">
-import { computed } from "vue";
-
-const props = withDefaults(
-  defineProps<{
-    direction?: "up" | "down" | "left" | "right";
-  }>(),
-  {
-    direction: "right",
-  },
-);
-
-const { data: portfolio } = usePortfolio();
-
-const emailHref =
-  "mailto:hudsonhugo90@gmail.com?subject=Contato%20pelo%20Portf%C3%B3lio&body=Ol%C3%A1%20Hudson%2C%20podemos%20conversar%3F";
-
-const socialLinks = computed(() => {
-  return [...(portfolio.value?.socialLinks ?? [])].sort(
-    (first, second) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0),
-  );
-});
-
-function normalize(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
-function findSocialUrl(platform: string) {
-  const normalizedPlatform = normalize(platform);
-
-  return (
-    socialLinks.value.find(
-      (item) => normalize(item.platform) === normalizedPlatform,
-    )?.url ?? ""
-  );
-}
-
-const githubUrl = computed(() => findSocialUrl("github"));
-const linkedinUrl = computed(() => findSocialUrl("linkedin"));
-const whatsappUrl = computed(() => findSocialUrl("whatsapp"));
-
-const handleClickBtn = (platform: string) => {
-  const url = findSocialUrl(platform);
-
-  if (url) {
-    window.open(url, "_blank");
-  }
-};
-</script>
-
 <template>
   <q-fab
     flat
@@ -95,3 +41,55 @@ const handleClickBtn = (platform: string) => {
     />
   </q-fab>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const props = withDefaults(
+  defineProps<{
+    direction?: 'up' | 'down' | 'left' | 'right'
+  }>(),
+  {
+    direction: 'right',
+  },
+)
+
+const { data: portfolio } = usePortfolio()
+
+const emailHref =
+  'mailto:hudsonhugo90@gmail.com?subject=Contato%20pelo%20Portf%C3%B3lio&body=Ol%C3%A1%20Hudson%2C%20podemos%20conversar%3F'
+
+const socialLinks = computed(() => {
+  return [...(portfolio.value?.socialLinks ?? [])].sort(
+    (first, second) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0),
+  )
+})
+
+function normalize(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
+function findSocialUrl(platform: string) {
+  const normalizedPlatform = normalize(platform)
+
+  return (
+    socialLinks.value.find((item) => normalize(item.platform) === normalizedPlatform)?.url ?? ''
+  )
+}
+
+const githubUrl = computed(() => findSocialUrl('github'))
+const linkedinUrl = computed(() => findSocialUrl('linkedin'))
+const whatsappUrl = computed(() => findSocialUrl('whatsapp'))
+
+const handleClickBtn = (platform: string) => {
+  const url = findSocialUrl(platform)
+
+  if (url) {
+    window.open(url, '_blank')
+  }
+}
+</script>

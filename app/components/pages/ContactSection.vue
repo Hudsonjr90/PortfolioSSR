@@ -1,3 +1,107 @@
+<template>
+  <section id="contato" class="q-py-md">
+    <div class="wrapper">
+      <!-- Cabeçalho -->
+      <div class="contact-heading q-mb-xl">
+        <div class="text-overline text-primary text-weight-bold">Contato</div>
+
+        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
+          Vamos conversar?
+        </div>
+
+        <div class="text-body1 q-mt-md">
+          Estou aberto a novas oportunidades, projetos e conexões profissionais. Se você tem uma
+          ideia ou oportunidade que possa fazer sentido, entre em contato.
+        </div>
+      </div>
+
+      <!-- Conteúdo -->
+      <div class="row q-col-gutter-lg">
+        <!-- Canais -->
+        <div class="col-12 col-md-5">
+          <q-card flat bordered class="contact-card full-height bg-transparent backdrop-blur">
+            <q-card-section class="q-pa-lg">
+              <div class="text-h6 text-weight-bold">Canais</div>
+
+              <div class="contact-list q-mt-lg">
+                <a :href="emailHref" class="contact-info" target="_blank">
+                  <q-avatar color="primary" text-color="white" size="44px">
+                    <q-icon name="mdi-email-outline" />
+                  </q-avatar>
+
+                  <div class="contact-info-content">
+                    <div class="text-caption">E-mail</div>
+
+                    <div class="text-body2 text-weight-bold">hudsonhugo90@gmail.com</div>
+                  </div>
+                </a>
+
+                <a
+                  v-for="social in socialLinks"
+                  :key="social.id"
+                  :href="social.url"
+                  class="contact-info"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <q-avatar color="primary" text-color="white" size="44px">
+                    <q-icon :name="getSocialIcon(social.platform, social.icon)" />
+                  </q-avatar>
+
+                  <div class="contact-info-content">
+                    <div class="text-caption">
+                      {{ getSocialLabel(social.platform, social.label) }}
+                    </div>
+
+                    <div class="text-body2 text-weight-bold">
+                      {{ getSocialDisplayValue(social.platform, social.url) }}
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+
+        <!-- Localização -->
+        <div class="col-12 col-md-7">
+          <q-card flat bordered class="contact-map-card full-height bg-transparent backdrop-blur">
+            <q-card-section class="q-pa-lg q-pb-md">
+              <div class="text-h6 text-weight-bold">
+                Localização
+
+                <q-chip class="text-body1 text-weight-bold bg-primary text-white">
+                  <q-icon
+                    name="mdi-map-marker-outline"
+                    text-color="white"
+                    size="26px"
+                    class="q-mr-xs"
+                  />
+                  {{ locationLabel }}
+                </q-chip>
+              </div>
+            </q-card-section>
+
+            <div ref="mapContainer" class="contact-map">
+              <div v-if="isMapLoading" class="map-state">
+                <q-spinner color="primary" size="36px" />
+
+                <div class="text-body2 q-mt-sm">Carregando mapa...</div>
+              </div>
+
+              <div v-if="mapError && !isMapLoading" class="map-state">
+                <q-icon name="mdi-map-outline" size="40px" color="primary" />
+
+                <div class="text-body2 q-mt-sm">Não foi possível carregar o mapa.</div>
+              </div>
+            </div>
+          </q-card>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -305,110 +409,6 @@ onBeforeUnmount(() => {
   map = null
 })
 </script>
-
-<template>
-  <section id="contato" class="q-py-md">
-    <div class="wrapper">
-      <!-- Cabeçalho -->
-      <div class="contact-heading q-mb-xl">
-        <div class="text-overline text-primary text-weight-bold">Contato</div>
-
-        <div class="text-weight-bold" :class="isMobile ? 'text-h4' : 'text-h3'">
-          Vamos conversar?
-        </div>
-
-        <div class="text-body1 q-mt-md">
-          Estou aberto a novas oportunidades, projetos e conexões profissionais. Se você tem uma
-          ideia ou oportunidade que possa fazer sentido, entre em contato.
-        </div>
-      </div>
-
-      <!-- Conteúdo -->
-      <div class="row q-col-gutter-lg">
-        <!-- Canais -->
-        <div class="col-12 col-md-5">
-          <q-card flat bordered class="contact-card full-height bg-transparent backdrop-blur">
-            <q-card-section class="q-pa-lg">
-              <div class="text-h6 text-weight-bold">Canais</div>
-
-              <div class="contact-list q-mt-lg">
-                <a :href="emailHref" class="contact-info" target="_blank">
-                  <q-avatar color="primary" text-color="white" size="44px">
-                    <q-icon name="mdi-email-outline" />
-                  </q-avatar>
-
-                  <div class="contact-info-content">
-                    <div class="text-caption">E-mail</div>
-
-                    <div class="text-body2 text-weight-bold">hudsonhugo90@gmail.com</div>
-                  </div>
-                </a>
-
-                <a
-                  v-for="social in socialLinks"
-                  :key="social.id"
-                  :href="social.url"
-                  class="contact-info"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <q-avatar color="primary" text-color="white" size="44px">
-                    <q-icon :name="getSocialIcon(social.platform, social.icon)" />
-                  </q-avatar>
-
-                  <div class="contact-info-content">
-                    <div class="text-caption">
-                      {{ getSocialLabel(social.platform, social.label) }}
-                    </div>
-
-                    <div class="text-body2 text-weight-bold">
-                      {{ getSocialDisplayValue(social.platform, social.url) }}
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
-
-        <!-- Localização -->
-        <div class="col-12 col-md-7">
-          <q-card flat bordered class="contact-map-card full-height bg-transparent backdrop-blur">
-            <q-card-section class="q-pa-lg q-pb-md">
-              <div class="text-h6 text-weight-bold">
-                Localização
-
-                <q-chip class="text-body1 text-weight-bold bg-primary text-white">
-                  <q-icon
-                    name="mdi-map-marker-outline"
-                    text-color="white"
-                    size="26px"
-                    class="q-mr-xs"
-                  />
-                  {{ locationLabel }}
-                </q-chip>
-              </div>
-            </q-card-section>
-
-            <div ref="mapContainer" class="contact-map">
-              <div v-if="isMapLoading" class="map-state">
-                <q-spinner color="primary" size="36px" />
-
-                <div class="text-body2 q-mt-sm">Carregando mapa...</div>
-              </div>
-
-              <div v-if="mapError && !isMapLoading" class="map-state">
-                <q-icon name="mdi-map-outline" size="40px" color="primary" />
-
-                <div class="text-body2 q-mt-sm">Não foi possível carregar o mapa.</div>
-              </div>
-            </div>
-          </q-card>
-        </div>
-      </div>
-    </div>
-  </section>
-</template>
 
 <style scoped>
 .contact-heading {
