@@ -55,6 +55,7 @@
         flat
         round
         icon="mdi-account-plus"
+        :class="isDark ? '' : 'text-dark'"
         to="/admin"
         />
       </div>
