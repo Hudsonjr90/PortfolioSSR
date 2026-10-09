@@ -1,18 +1,154 @@
+<template>
+  <q-header bordered height-hint="50" class="bg-transparent backdrop-blur">
+    <q-toolbar class="wrapper q-px-md">
+      <!-- Logo -->
+      <q-toolbar-title class="col-auto">
+        <a
+          href="/"
+          class="row items-center no-decoration"
+          aria-label="Voltar ao início"
+          @click.prevent="handleLogoClick"
+        >
+          <img :src="logo" alt="Logo" height="60" width="60" class="q-pa-xs" />
+        </a>
+      </q-toolbar-title>
+
+      <q-space />
+
+      <!-- Menu principal -->
+      <q-tabs
+        v-model="activeSection"
+        class="gt-sm"
+        active-color="primary"
+        indicator-color="primary"
+        narrow-indicator
+        shrink
+        align="center"
+      >
+        <q-tab
+          v-for="section in sections"
+          :key="section.id"
+          :name="section.id"
+          :label="section.label"
+          no-caps
+          :class="isDark ? '' : 'text-dark'"
+          @click="scrollToSection(section.id)"
+        />
+      </q-tabs>
+
+      <q-space />
+
+      <!-- Tema desktop -->
+      <div class="row items-center q-gutter-xs gt-sm">
+        <q-btn
+          flat
+          round
+          :icon="themeIcon"
+          :aria-label="themeLabel"
+          :title="themeLabel"
+          :class="isDark ? '' : 'text-dark'"
+          @click="toggleTheme"
+        />
+
+        <q-btn
+         v-if="devLogin"
+        flat
+        round
+        icon="mdi-account-plus"
+        to="/admin"
+        />
+      </div>
+
+      <!-- Tema mobile -->
+      <q-btn
+        flat
+        round
+        :icon="themeIcon"
+        class="lt-md"
+        :aria-label="themeLabel"
+        :title="themeLabel"
+        :class="isDark ? '' : 'text-dark'"
+        @click="toggleTheme"
+      />
+
+      <!-- Botão menu mobile -->
+      <q-btn
+        flat
+        round
+        icon="mdi-menu"
+        class="lt-md"
+        :class="isDark ? '' : 'text-dark'"
+        aria-label="Abrir menu"
+        @click="isMobileMenuOpen = true"
+      />
+    </q-toolbar>
+  </q-header>
+
+  <!-- =====================================================
+       DRAWER MOBILE
+       ===================================================== -->
+
+  <q-drawer
+    v-model="isMobileMenuOpen"
+    side="right"
+    overlay
+    bordered
+    behavior="mobile"
+    :dark="isDark"
+    :width="280"
+    :class="isDark ? 'bg-grey-9' : ''"
+  >
+    <!-- Cabeçalho -->
+    <div
+      class="row items-center justify-between q-pa-md"
+      :class="isDark ? 'text-white text-bold' : 'text-bold'"
+    >
+      <span class="text-subtitle1 text-bold"> Menu </span>
+
+      <q-btn
+        flat
+        round
+        icon="mdi-close"
+        aria-label="Fechar menu"
+        @click="isMobileMenuOpen = false"
+      />
+    </div>
+
+    <q-separator :dark="isDark" />
+
+    <!-- Links -->
+    <q-list padding :class="isDark ? 'text-white text-bold' : 'text-dark text-bold'">
+      <q-item
+        v-for="section in sections"
+        :key="section.id"
+        clickable
+        :active="activeSection === section.id"
+        active-class="text-primary"
+        @click="scrollToSection(section.id)"
+      >
+        <q-item-section top avatar>
+          <q-avatar rounded>
+            <q-icon :name="section.icon" size="30px" aria-hidden="true" />
+          </q-avatar>
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label>
+            {{ section.label }}
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+    </q-list>
+  </q-drawer>
+</template>
+
 <script setup lang="ts">
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-} from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import logo from '/logo.png'
 
-const {
-  isDark,
-  isReady: isThemeReady,
-  toggleTheme,
-} = useTheme()
+const devLogin = computed(() => import.meta.dev)
+
+const { isDark, isReady: isThemeReady, toggleTheme } = useTheme()
 const { isMobile } = useMobile()
 
 const activeSection = ref<string | null>(null)
@@ -28,9 +164,7 @@ const themeIcon = computed(() => {
 })
 
 const themeLabel = computed(() => {
-  return isDark.value
-    ? 'Ativar tema claro'
-    : 'Ativar tema escuro'
+  return isDark.value ? 'Ativar tema claro' : 'Ativar tema escuro'
 })
 
 const sections = [
@@ -84,13 +218,7 @@ function getHeaderHeight() {
 function updateActiveSection() {
   const headerHeight = getHeaderHeight()
 
-  const activationLine =
-    window.scrollY +
-    headerHeight +
-    Math.min(
-      180,
-      window.innerHeight * 0.25,
-    )
+  const activationLine = window.scrollY + headerHeight + Math.min(180, window.innerHeight * 0.25)
 
   let currentSection: string | null = null
 
@@ -101,28 +229,21 @@ function updateActiveSection() {
       continue
     }
 
-    const sectionTop =
-      element.getBoundingClientRect().top +
-      window.scrollY
+    const sectionTop = element.getBoundingClientRect().top + window.scrollY
 
     if (sectionTop <= activationLine) {
       currentSection = section.id
     }
   }
 
-  const documentHeight =
-    document.documentElement.scrollHeight
+  const documentHeight = document.documentElement.scrollHeight
 
-  const viewportBottom =
-    window.scrollY +
-    window.innerHeight
+  const viewportBottom = window.scrollY + window.innerHeight
 
-  const reachedPageBottom =
-    viewportBottom >= documentHeight - 8
+  const reachedPageBottom = viewportBottom >= documentHeight - 8
 
   if (reachedPageBottom) {
-    const contactElement =
-      getSectionElement('contato')
+    const contactElement = getSectionElement('contato')
 
     if (contactElement) {
       currentSection = 'contato'
@@ -139,13 +260,7 @@ let scrollSettlementFrame = 0
 function getSectionScrollPosition(element: HTMLElement) {
   const headerHeight = getHeaderHeight()
 
-  return Math.max(
-    element.getBoundingClientRect().top +
-      window.scrollY -
-      headerHeight -
-      12,
-    0,
-  )
+  return Math.max(element.getBoundingClientRect().top + window.scrollY - headerHeight - 12, 0)
 }
 
 function waitForProgrammaticScroll(id: string) {
@@ -164,8 +279,7 @@ function waitForProgrammaticScroll(id: string) {
     }
 
     const targetPosition = getSectionScrollPosition(element)
-    const reachedTarget =
-      Math.abs(window.scrollY - targetPosition) <= 2
+    const reachedTarget = Math.abs(window.scrollY - targetPosition) <= 2
 
     if (reachedTarget) {
       programmaticScrollTarget = null
@@ -173,18 +287,14 @@ function waitForProgrammaticScroll(id: string) {
       return
     }
 
-    scrollSettlementFrame = window.requestAnimationFrame(
-      checkPosition,
-    )
+    scrollSettlementFrame = window.requestAnimationFrame(checkPosition)
   }
 
   if (scrollSettlementFrame) {
     window.cancelAnimationFrame(scrollSettlementFrame)
   }
 
-  scrollSettlementFrame = window.requestAnimationFrame(
-    checkPosition,
-  )
+  scrollSettlementFrame = window.requestAnimationFrame(checkPosition)
 }
 
 function handleScroll() {
@@ -217,11 +327,7 @@ async function scrollToSection(id: string) {
 
   activeSection.value = id
 
-  window.history.replaceState(
-    null,
-    '',
-    `#${id}`,
-  )
+  window.history.replaceState(null, '', `#${id}`)
 
   isMobileMenuOpen.value = false
 
@@ -255,11 +361,7 @@ function handleLogoClick() {
 
   isMobileMenuOpen.value = false
 
-  window.history.replaceState(
-    null,
-    '',
-    window.location.pathname,
-  )
+  window.history.replaceState(null, '', window.location.pathname)
 
   programmaticScrollTarget = null
 }
@@ -267,21 +369,13 @@ function handleLogoClick() {
 onMounted(async () => {
   await nextTick()
 
-  window.addEventListener(
-    'scroll',
-    handleScroll,
-    {
-      passive: true,
-    },
-  )
+  window.addEventListener('scroll', handleScroll, {
+    passive: true,
+  })
 
-  window.addEventListener(
-    'resize',
-    handleScroll,
-    {
-      passive: true,
-    },
-  )
+  window.addEventListener('resize', handleScroll, {
+    passive: true,
+  })
 
   if (!isMobile.value) {
     requestAnimationFrame(() => {
@@ -291,185 +385,12 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener(
-    'scroll',
-    handleScroll,
-  )
+  window.removeEventListener('scroll', handleScroll)
 
-  window.removeEventListener(
-    'resize',
-    handleScroll,
-  )
+  window.removeEventListener('resize', handleScroll)
 
   if (scrollSettlementFrame) {
     window.cancelAnimationFrame(scrollSettlementFrame)
   }
 })
 </script>
-
-<template>
-  <q-header
-    bordered
-    height-hint="50"
-    class="bg-transparent backdrop-blur"
-  >
-    <q-toolbar class="wrapper q-px-md">
-
-      <!-- Logo -->
-      <q-toolbar-title class="col-auto">
-        <a
-          href="/"
-          class="row items-center no-decoration"
-          aria-label="Voltar ao início"
-          @click.prevent="handleLogoClick"
-        >
-          <img
-            :src="logo"
-            alt="Logo"
-            height="60"
-            width="60"
-            class="q-pa-xs"
-          />
-        </a>
-      </q-toolbar-title>
-
-      <q-space />
-
-      <!-- Menu principal -->
-      <q-tabs
-        v-model="activeSection"
-        class="gt-sm"
-        active-color="primary"
-        indicator-color="primary"
-        narrow-indicator
-        shrink
-        align="center"
-      >
-        <q-tab
-          v-for="section in sections"
-          :key="section.id"
-          :name="section.id"
-          :label="section.label"
-          no-caps
-          :class="isDark ? '' : 'text-dark'"
-          @click="scrollToSection(section.id)"
-        />
-      </q-tabs>
-
-      <q-space />
-
-      <!-- Tema desktop -->
-      <div class="row items-center q-gutter-xs gt-sm">
-        <q-btn
-          flat
-          round
-          :icon="themeIcon"
-          :aria-label="themeLabel"
-          :title="themeLabel"
-          :class="isDark ? '' : 'text-dark'"
-          @click="toggleTheme"
-        />
-      </div>
-
-      <!-- Tema mobile -->
-      <q-btn
-        flat
-        round
-        :icon="themeIcon"
-        class="lt-md"
-        :aria-label="themeLabel"
-        :title="themeLabel"
-        :class="isDark ? '' : 'text-dark'"
-        @click="toggleTheme"
-      />
-
-      <!-- Botão menu mobile -->
-      <q-btn
-        flat
-        round
-        icon="mdi-menu"
-        class="lt-md"
-        :class="isDark ? '' : 'text-dark'"
-        aria-label="Abrir menu"
-        @click="isMobileMenuOpen = true"
-      />
-    </q-toolbar>
-  </q-header>
-
-  <!-- =====================================================
-       DRAWER MOBILE
-       ===================================================== -->
-
-  <q-drawer
-    v-model="isMobileMenuOpen"
-    side="right"
-    overlay
-    bordered
-    behavior="mobile"
-    :dark="isDark"
-    :width="280"
-    :class="isDark ? 'bg-grey-9' : ''"
-  >
-    <!-- Cabeçalho -->
-    <div
-      class="row items-center justify-between q-pa-md"
-      :class="
-        isDark
-          ? 'text-white text-bold'
-          : 'text-bold'
-      "
-    >
-      <span class="text-subtitle1 text-bold">
-        Menu
-      </span>
-
-      <q-btn
-        flat
-        round
-        icon="mdi-close"
-        aria-label="Fechar menu"
-        @click="isMobileMenuOpen = false"
-      />
-    </div>
-
-    <q-separator :dark="isDark" />
-
-    <!-- Links -->
-    <q-list
-      padding
-      :class="
-        isDark
-          ? 'text-white text-bold'
-          : 'text-dark text-bold'
-      "
-    >
-      <q-item
-        v-for="section in sections"
-        :key="section.id"
-        clickable
-        :active="activeSection === section.id"
-        active-class="text-primary"
-        @click="scrollToSection(section.id)"
-      >
-        <q-item-section
-          top
-          avatar
-        >
-          <q-avatar rounded>
-            <q-icon
-              :name="section.icon"
-              size="30px"
-              aria-hidden="true"
-            />
-          </q-avatar>
-        </q-item-section>
-
-        <q-item-section>
-          <q-item-label>
-            {{ section.label }}
-          </q-item-label>
-        </q-item-section>
-      </q-item>
-    </q-list>
-  </q-drawer>
-</template>

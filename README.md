@@ -223,9 +223,26 @@ npm run db:seed
 No ambiente local, a rota `/admin` permite entrar com a senha definida em
 `DEV_ADMIN_PASSWORD` no `.env` e cadastrar, editar, publicar ou remover projetos.
 Essa área e suas APIs ficam indisponíveis quando a aplicação é executada em produção.
+O painel organiza formação acadêmica, experiência profissional, depoimentos e stack
+tecnológica em módulos próprios; por enquanto, a edição e persistência disponíveis são
+as de projetos.
 Imagens locais devem usar o nome do arquivo em `app/assets/images` (por exemplo,
 `agenda.png`); GIFs podem usar um caminho relativo como `gifs/agenda.gif`. Também é
 possível informar URLs públicas para imagens e GIFs.
+
+As APIs administrativas usam o cookie de sessão obtido em `POST /api/dev-admin/login`.
+Todos os endpoints abaixo exigem sessão e ficam desabilitados em produção:
+
+| Recurso | Listar | Criar | Editar | Excluir |
+| --- | --- | --- | --- | --- |
+| Formação acadêmica | `GET /api/dev-admin/education` | `POST /api/dev-admin/education` | `PUT /api/dev-admin/education/:id` | `DELETE /api/dev-admin/education/:id` |
+| Experiência profissional | `GET /api/dev-admin/experiences` | `POST /api/dev-admin/experiences` | `PUT /api/dev-admin/experiences/:id` | `DELETE /api/dev-admin/experiences/:id` |
+| Depoimentos | `GET /api/dev-admin/testimonials` | `POST /api/dev-admin/testimonials` | `PUT /api/dev-admin/testimonials/:id` | `DELETE /api/dev-admin/testimonials/:id` |
+| Stack tecnológica | `GET /api/dev-admin/technology` | `POST /api/dev-admin/technology` | `PUT /api/dev-admin/technology/:id` | `DELETE /api/dev-admin/technology/:id` |
+
+As experiências recebem `technologyIds` para vincular tecnologias; depoimentos recebem
+`experienceId` para associá-los a uma experiência existente. Formação e experiência
+são vinculadas ao perfil principal já cadastrado.
 
 Uma representação simplificada:
 ```text

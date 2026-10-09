@@ -91,10 +91,14 @@
             </div>
           </div>
 
-          <!-- Avatar com efeito elétrico -->
-          <div class="col-12 col-md-5 flex flex-center">
-            <div class="profile-avatar">
-              <!-- Anel elétrico -->
+          <!-- Avatar com efeito elétrico e card de apresentação -->
+          <div class="col-12 col-md-5 flex flex-center profile-avatar-col">
+            <div
+              class="profile-avatar"
+              @mouseenter="showProfileCard = true"
+              @mouseleave="showProfileCard = false"
+            >
+              <!-- Anel elétrico: preservado -->
               <div class="profile-avatar__electric" aria-hidden="true">
                 <span class="electric-spark electric-spark--1"></span>
                 <span class="electric-spark electric-spark--2"></span>
@@ -104,10 +108,12 @@
                 <span class="electric-spark electric-spark--6"></span>
               </div>
 
+              <!-- Imagem e efeito pixelado: preservados -->
               <div
                 class="profile-avatar__image shadow-10"
                 @mouseenter="drawPixelEffect"
                 @mouseleave="clearPixelEffect"
+                @click="showProfileCard = !showProfileCard"
               >
                 <img
                   class="profile-avatar__image-base"
@@ -122,6 +128,46 @@
                   aria-hidden="true"
                 ></canvas>
               </div>
+
+              <!-- Card de apresentação: abaixo da foto, centralizado -->
+              <!-- Card estilo editor de código -->
+              <Transition name="profile-card">
+                <div v-if="showProfileCard" class="profile-code-card" role="status">
+                  <!-- Barra da janela: bolinhas + nome do arquivo -->
+                  <div class="profile-code-card__bar">
+                    <span
+                      class="profile-code-card__dot profile-code-card__dot--red"
+                      aria-hidden="true"
+                    />
+                    <span
+                      class="profile-code-card__dot profile-code-card__dot--yellow"
+                      aria-hidden="true"
+                    />
+                    <span
+                      class="profile-code-card__dot profile-code-card__dot--green"
+                      aria-hidden="true"
+                    />
+                    
+                  </div>
+
+                  <!-- Código com syntax highlight -->
+                  <pre
+                    class="profile-code-card__code"
+                  ><code><span class="tok-kw">const</span> <span class="tok-var">developer</span> <span class="tok-op">=</span> <span class="tok-punc">{</span>
+  <span class="tok-prop">name</span><span class="tok-punc">:</span> <span class="tok-str">"{{ portfolio.profile.name }}"</span><span class="tok-punc">,</span>
+  <span class="tok-prop">role</span><span class="tok-punc">:</span> <span class="tok-str">"{{ portfolio.profile.headline }}"</span><span class="tok-punc">,</span>
+  <span class="tok-prop">mindset</span><span class="tok-punc">:</span> <span class="tok-str">"builder"</span><span class="tok-punc">,</span>
+  <span class="tok-prop">stack</span><span class="tok-punc">:</span> <span class="tok-str">"full-stack"</span><span class="tok-punc">,</span>
+  <span class="tok-prop">coffee</span><span class="tok-punc">:</span> <span class="tok-bool">true</span><span class="tok-punc">,</span>
+<span class="tok-punct">}</span></code></pre>
+
+                  <!-- Banner inferior -->
+                  <div class="profile-code-card__banner">
+                    <q-icon name="mdi-lightning-bolt" size="16px" aria-hidden="true" />
+                    <span>Transformando ideias em realidade</span>
+                  </div>
+                </div>
+              </Transition>
             </div>
           </div>
         </div>
@@ -248,7 +294,6 @@
 import { onBeforeUnmount, ref } from 'vue'
 import profileImage from '~/assets/images/profile/my.webp'
 
-
 const { data: portfolio, pending, error } = usePortfolio()
 
 const { isMobile } = useMobile()
@@ -256,6 +301,7 @@ const { isDark } = useTheme()
 
 const activePrinciple = ref('0')
 const isAboutExpanded = ref(false)
+const showProfileCard = ref(false)
 const pixelCanvas = ref<HTMLCanvasElement | null>(null)
 
 let pixelEffectImage: HTMLImageElement | null = null
@@ -481,6 +527,12 @@ const principles = [
    AVATAR / EFEITO ELÉTRICO
    ========================================================= */
 
+/* Coluna do avatar: garante espaço para o card aparecer abaixo da foto */
+.profile-avatar-col {
+  position: relative;
+  padding-bottom: 120px;
+}
+
 .profile-avatar {
   --avatar-size: 280px;
 
@@ -490,6 +542,7 @@ const principles = [
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 }
 
 /* =========================================================
@@ -524,9 +577,6 @@ const principles = [
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
-}
-
-.profile-avatar__pixelated {
   display: block;
   width: 100%;
   height: 100%;
@@ -778,6 +828,146 @@ const principles = [
 }
 
 /* =========================================================
+   CARD DE APRESENTAÇÃO (abaixo da foto, centralizado)
+   ========================================================= */
+
+.profile-intro-card {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: calc(100% + 16px);
+  width: min(320px, calc(100vw - 48px));
+  padding: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.65);
+  border-radius: 12px;
+  background: rgba(7, 11, 20, 0.96);
+  color: #f8fafc;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(0, 212, 255, 0.1);
+  transform: translateX(-50%);
+  backdrop-filter: blur(12px);
+}
+
+.profile-intro-card__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Entrada e saída suaves: desliza de cima (da foto) para baixo */
+.profile-card-enter-active,
+.profile-card-leave-active {
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
+.profile-card-enter-from,
+.profile-card-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -8px);
+}
+
+/* =========================================================
+   CARD ESTILO EDITOR DE CÓDIGO
+   ========================================================= */
+
+.profile-code-card {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: calc(100% + 16px);
+  width: min(340px, calc(100vw - 48px));
+  border: 1px solid rgba(0, 212, 255, 0.45);
+  border-radius: 10px;
+  box-shadow:
+    0 14px 38px rgba(0, 0, 0, 0.4),
+    0 0 22px rgba(0, 212, 255, 0.12);
+  overflow: hidden;
+  transform: translateX(-50%);
+  backdrop-filter: blur(12px);
+  font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+}
+
+/* Barra da janela */
+.profile-code-card__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.profile-code-card__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.profile-code-card__dot--red { background: #ff5f57; }
+.profile-code-card__dot--yellow { background: #febc2e; }
+.profile-code-card__dot--green { background: #28c840; }
+
+.profile-code-card__filename {
+  margin-left: 6px;
+  font-size: 11px;
+  color: rgba(248, 250, 252, 0.55);
+}
+
+/* Código */
+.profile-code-card__code {
+  margin: 0;
+  padding: 14px 16px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Tokens de syntax highlight */
+.tok-kw { color: #c792ea; }        /* const — roxo */
+.tok-var { color: #82aaff; }       /* developer — azul */
+.tok-op { color: #89ddff; }         /* = — ciano */
+.tok-punc { color: rgba(226, 232, 240, 0.65); } /* pontuação */
+.tok-prop { color: #f07178; }       /* name, role — vermelho/rosa */
+.tok-str { color: #c3e88d; }        /* strings — verde */
+.tok-bool { color: #ffcb6b; }      /* true — amarelo */
+
+/* Banner inferior */
+.profile-code-card__banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #00d4ff; /* ou verde #28c840, como no modelo */
+  color: #05070d;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.profile-code-card__banner .q-icon {
+  color: #05070d;
+}
+
+/* Animação de entrada: mantém a mesma do card anterior */
+.profile-card-enter-active,
+.profile-card-leave-active {
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
+.profile-card-enter-from,
+.profile-card-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -8px);
+}
+
+/* =========================================================
    ACESSIBILIDADE
    ========================================================= */
 
@@ -792,6 +982,11 @@ const principles = [
 
   .profile-avatar:hover .profile-avatar__electric {
     opacity: 1;
+  }
+
+  .profile-card-enter-active,
+  .profile-card-leave-active {
+    transition: none;
   }
 }
 
@@ -816,6 +1011,10 @@ Mobile Styles
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .profile-avatar-col {
+    padding-bottom: 140px;
   }
 
   .about-actions {
