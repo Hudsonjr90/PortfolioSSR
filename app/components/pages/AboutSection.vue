@@ -165,7 +165,7 @@
               flat
               bordered
               class="principle-card"
-              :class="isDark ? 'bg-transparent backdrop-blur' : 'bg-primary'"
+              :class="isDark ? 'bg-transparent backdrop-blur' : 'bg-dark'"
             >
               <q-card-section class="principle-card__content">
                 <q-avatar

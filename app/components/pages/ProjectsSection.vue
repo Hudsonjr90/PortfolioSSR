@@ -38,7 +38,8 @@
             clickable
             role="button"
             :aria-label="`Ver detalhes de ${project.name || `projeto ${(currentPage - 1) * projectsPerPage + index + 1}`}`"
-            class="full-height bg-transparent backdrop-blur project-card"
+            class="full-height project-card"
+            :class="isDark ? 'bg-transparent backdrop-blur' : 'bg-dark'"
             @click="openProject(project)"
             @keyup.enter="openProject(project)"
             @keyup.space.prevent="openProject(project)"
@@ -115,6 +116,7 @@ import ProjectsCard from './ProjectsCard.vue'
 import type { ProjectRecord } from '#shared/types/project'
 import { resolveProjectAsset } from '~/utils/global'
 
+const { isDark } = useTheme()
 const projectsPerPage = 3
 const currentPage = ref(1)
 const selectedProject = ref<ProjectRecord | null>(null)
