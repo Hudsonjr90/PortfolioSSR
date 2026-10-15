@@ -1,5 +1,10 @@
 <template>
-  <section id="sobre" class="q-py-xl" aria-labelledby="about-title">
+  <section
+    id="sobre"
+    class="q-py-xl"
+    :class="{ 'about--reset': isReset }"
+    aria-labelledby="about-title"
+  >
     <div class="wrapper">
       <div
         v-if="pending"
@@ -18,28 +23,30 @@
 
       <template v-else-if="portfolio">
         <!-- Apresentação principal -->
-        <div class="row items-center q-col-gutter-xl">
+        <div ref="heroRef" class="row items-center q-col-gutter-xl">
           <div class="col-12 col-md-7">
             <h1
               id="about-title"
-              class="text-weight-bold q-mb-md"
+              class="enter text-weight-bold q-mb-md"
               :class="isMobile ? 'text-h4' : 'text-h2'"
+              style="--delay: 0ms"
             >
               {{ portfolio.profile.name }}
             </h1>
 
             <p
-              class="text-primary text-weight-medium q-mb-lg"
+              class="enter text-primary text-weight-medium q-mb-lg"
               :class="isMobile ? 'text-h5' : 'text-h4'"
+              style="--delay: 140ms"
             >
               {{ portfolio.profile.headline }}
             </p>
 
-            <p class="text-body1 q-mb-xl">
+            <p class="enter text-body1 q-mb-xl" style="--delay: 280ms">
               {{ portfolio.profile.shortBio }}
             </p>
 
-            <div class="about-sections row items-center q-gutter-sm">
+            <div class="enter about-sections row items-center q-gutter-sm" style="--delay: 420ms">
               <q-btn-dropdown
                 outline
                 icon="mdi-file-document-outline"
@@ -93,7 +100,7 @@
 
           <!-- Avatar com efeito elétrico -->
           <div class="col-12 col-md-5 flex flex-center">
-            <div class="profile-avatar">
+            <div class="enter enter--avatar profile-avatar" style="--delay: 200ms">
               <!-- Anel elétrico -->
               <div class="profile-avatar__electric" aria-hidden="true">
                 <span class="electric-spark electric-spark--1"></span>
@@ -127,16 +134,25 @@
         </div>
 
         <!-- Sobre mim -->
-        <div class="about-content q-mt-xl">
+        <div
+          ref="aboutRef"
+          class="about-content q-mt-xl"
+          :class="{ 'about-content--reset': isAboutReset }"
+        >
           <div class="about-text">
-            <h2 class="text-weight-bold q-mb-lg" :class="isMobile ? 'text-h4' : 'text-h3'">
+            <h2
+              class="reveal text-weight-bold q-mb-lg"
+              :class="isMobile ? 'text-h4' : 'text-h3'"
+              style="--delay: 0ms"
+            >
               <div class="text-overline text-primary" aria-hidden="true">Sobre mim</div>
               Experiência que gera resultado
             </h2>
 
             <p
               id="about-description"
-              class="text-body1 about-description"
+              class="reveal text-body1 about-description"
+              style="--delay: 140ms"
               :class="{ 'about-description--collapsed': isMobile && !isAboutExpanded }"
             >
               {{ portfolio.profile.about }}
@@ -149,6 +165,8 @@
               no-caps
               :label="isAboutExpanded ? 'Ler menos' : 'Ler mais'"
               :icon="isAboutExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              class="reveal"
+              style="--delay: 280ms"
               :aria-expanded="isAboutExpanded"
               aria-controls="about-description"
               @click="isAboutExpanded = !isAboutExpanded"
@@ -257,6 +275,14 @@ const { isDark } = useTheme()
 const activePrinciple = ref('0')
 const isAboutExpanded = ref(false)
 const pixelCanvas = ref<HTMLCanvasElement | null>(null)
+
+// Reinicia a animação de entrada sempre que o hero sai e volta para a tela
+const heroRef = ref<HTMLElement | null>(null)
+const { isReset } = useReplayOnView(heroRef)
+
+// Mesma ideia para o bloco "Sobre mim", que tem a sua própria entrada
+const aboutRef = ref<HTMLElement | null>(null)
+const { isReset: isAboutReset } = useReplayOnView(aboutRef)
 
 let pixelEffectImage: HTMLImageElement | null = null
 
@@ -368,6 +394,72 @@ const principles = [
 </script>
 
 <style>
+/* =========================================================
+   ENTRADA INICIAL (hero)
+   Sequência única: textos sobem em cascata, o avatar
+   aparece e o anel elétrico dispara uma vez.
+   O atraso de cada item vem de --delay (definido no template).
+   ========================================================= */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes avatar-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.enter,
+.reveal {
+  opacity: 0;
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.enter--avatar {
+  animation-name: avatar-in;
+}
+
+/* REPLAY
+   Enquanto o hero está totalmente fora da tela, as animações ficam
+   desligadas. Quando a classe sai, elas reiniciam do zero. */
+.about--reset .enter,
+.about--reset .profile-avatar__electric,
+.about--reset .profile-avatar__electric::before {
+  animation: none;
+}
+
+/* Mesmo reset para o bloco "Sobre mim" */
+.about-content--reset .reveal {
+  animation: none;
+}
+
 /* =========================================================
    SOBRE MIM
    ========================================================= */
@@ -534,6 +626,10 @@ const principles = [
 
 /* =========================================================
    CONTAINER DO EFEITO
+   Na entrada da página o anel acende uma única vez
+   (electric-intro). Sem fill-mode "forwards" de propósito:
+   depois da animação, o estado volta ao normal e o hover
+   continua funcionando.
    ========================================================= */
 
 .profile-avatar__electric {
@@ -548,6 +644,8 @@ const principles = [
   transition:
     opacity 0.25s ease,
     transform 0.35s ease;
+
+  animation: electric-intro 1.8s ease-out 0.9s backwards;
 }
 
 /* =========================================================
@@ -601,7 +699,7 @@ const principles = [
 
   transform-origin: center center;
 
-  animation: none;
+  animation: electric-rotate 1.8s ease-out 0.9s backwards;
 }
 
 /* =========================================================
@@ -731,6 +829,28 @@ const principles = [
    ANIMAÇÕES
    ========================================================= */
 
+@keyframes electric-intro {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
 @keyframes electric-rotate {
   from {
     transform: rotate(0deg);
@@ -782,6 +902,15 @@ const principles = [
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  /* Sem deslocamento nem zoom: mantém só um fade suave */
+  .enter,
+  .reveal,
+  .enter--avatar {
+    animation-name: fade-in;
+    animation-duration: 0.6s;
+  }
+
+  .profile-avatar__electric,
   .profile-avatar__electric::before,
   .profile-avatar__electric::after,
   .electric-spark,
