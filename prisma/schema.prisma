@@ -21,7 +21,6 @@ model Profile {
 
   experiences    Experience[]
   education      Education[]
-  certifications Certification[]
   socialLinks    SocialLink[]
 }
 
@@ -116,25 +115,6 @@ model Education {
   @@index([profileId])
   @@index([sortOrder])
 }
-
-model Certification {
-  id            String    @id @default(cuid())
-  profileId     String
-  name          String
-  issuer        String
-  issuedAt      DateTime?
-  credentialUrl String?
-  sortOrder     Int       @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@index([profileId])
-  @@index([sortOrder])
-}
-
 model SocialLink {
   id        String  @id @default(cuid())
   profileId String
