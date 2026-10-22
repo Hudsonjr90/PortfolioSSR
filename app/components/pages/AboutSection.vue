@@ -1,6 +1,6 @@
 <template>
   <section
-    id="sobre"
+    id="about"
     class="q-py-xl"
     :class="{ 'about--reset': isReset }"
     aria-labelledby="about-title"

@@ -170,37 +170,37 @@ const themeLabel = computed(() => {
 
 const sections = [
   {
-    id: 'sobre',
+    id: 'about',
     label: 'Sobre',
     icon: 'mdi-information-outline',
   },
   {
-    id: 'formacoes',
+    id: 'formations',
     label: 'Formações',
     icon: 'mdi-school-outline',
   },
   {
-    id: 'experiencia',
+    id: 'experiences',
     label: 'Experiências',
     icon: 'mdi-briefcase-account-outline',
   },
   {
-    id: 'depoimentos',
+    id: 'testimonials',
     label: 'Depoimentos',
     icon: 'mdi-message-text-outline',
   },
   {
-    id: 'projetos',
+    id: 'projects',
     label: 'Projetos',
     icon: 'mdi-folder-outline',
   },
   {
-    id: 'tecnologias',
+    id: 'technologies',
     label: 'Tecnologias',
     icon: 'mdi-laptop-account',
   },
   {
-    id: 'contato',
+    id: 'contact',
     label: 'Contato',
     icon: 'mdi-phone-outline',
   },

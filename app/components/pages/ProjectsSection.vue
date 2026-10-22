@@ -1,5 +1,5 @@
 <template>
-  <section id="projetos" class="q-py-xl" aria-labelledby="projects-title">
+  <section id="projects" class="q-py-xl" aria-labelledby="projects-title">
     <div class="wrapper">
       <div class="q-mb-xl text-left">
         <div class="text-primary text-weight-bold">Projetos</div>

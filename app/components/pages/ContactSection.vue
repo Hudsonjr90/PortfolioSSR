@@ -1,5 +1,5 @@
 <template>
-  <section id="contato" class="q-py-md">
+  <section id="contact" class="q-py-md">
     <div class="wrapper">
       <!-- Cabeçalho -->
       <div class="contact-heading q-mb-xl">

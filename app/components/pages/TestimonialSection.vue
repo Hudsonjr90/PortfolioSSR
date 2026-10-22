@@ -1,5 +1,5 @@
 <template>
-  <section id="depoimentos" class="q-py-md">
+  <section id="testimonials" class="q-py-md">
     <div class="wrapper">
       <div class="testimonial-heading q-mb-xl">
         <div class="text-overline text-primary text-weight-bold">Depoimentos</div>

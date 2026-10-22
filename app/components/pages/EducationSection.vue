@@ -1,5 +1,5 @@
 <template>
-  <section id="formacoes" class="q-py-md">
+  <section id="formations" class="q-py-md">
     <div class="wrapper">
       <!-- Cabeçalho -->
       <div class="q-mb-xl">

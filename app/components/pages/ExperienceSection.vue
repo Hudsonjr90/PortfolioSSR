@@ -1,5 +1,5 @@
 <template>
-  <section id="experiencia" class="q-py-md">
+  <section id="experiences" class="q-py-md">
     <div class="wrapper">
       <!-- Cabeçalho -->
       <div class="q-mb-xl">

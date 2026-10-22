@@ -1,5 +1,5 @@
 <template>
-  <section id="tecnologias" class="q-py-md">
+  <section id="technologies" class="q-py-md">
     <div class="wrapper">
       <!-- Cabeçalho -->
       <div class="row items-end justify-between q-col-gutter-xl q-mb-xl">
