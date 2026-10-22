@@ -82,15 +82,6 @@ export async function getPortfolio() {
       sortOrder: education.sortOrder,
     })),
 
-    certifications: data.profile.certifications.map((certification) => ({
-      id: certification.id,
-      name: certification.name,
-      issuer: certification.issuer,
-      issuedAt: certification.issuedAt,
-      credentialUrl: certification.credentialUrl,
-      sortOrder: certification.sortOrder,
-    })),
-
     socialLinks: data.profile.socialLinks.map((socialLink) => ({
       id: socialLink.id,
       platform: socialLink.platform,

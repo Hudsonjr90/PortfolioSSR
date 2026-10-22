@@ -33,12 +33,6 @@ export async function findPortfolio() {
           },
         },
 
-        certifications: {
-          orderBy: {
-            sortOrder: 'asc',
-          },
-        },
-
         socialLinks: {
           orderBy: {
             sortOrder: 'asc',
