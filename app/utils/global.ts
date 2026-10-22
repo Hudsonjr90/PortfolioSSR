@@ -151,3 +151,14 @@ export function resolveProjectAsset(path: string | null) {
   const normalizedPath = path.replace(/^\.?\//, '')
   return projectAssets[`../assets/images/${normalizedPath}`] ?? path
 }
+
+export function formatDate(date: string | null) {
+  if (!date) {
+    return 'Atual'
+  }
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(date))
+}

@@ -506,7 +506,6 @@ onMounted(async () => {
 
 <style scoped>
 .admin-panel {
-  background: rgba(20, 20, 20, 0.72);
   backdrop-filter: blur(12px);
 }
 

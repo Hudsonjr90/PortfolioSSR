@@ -19,7 +19,5 @@ import AdminDashboard from '~/components/pages/admin/AdminDashboard.vue'
 .container-style {
   position: relative;
   min-height: 100vh;
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.18) 1.3px, transparent 1.3px);
-  background-size: 42px 42px;
 }
 </style>
