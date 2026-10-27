@@ -1,3 +1,27 @@
+<template>
+  <transition
+    enter-active-class="scroll-top-enter-active"
+    leave-active-class="scroll-top-leave-active"
+    enter-from-class="scroll-top-enter-from"
+    leave-to-class="scroll-top-leave-to"
+  >
+    <q-btn
+      v-if="isVisible"
+      round
+      unelevated
+      color="primary"
+      icon="mdi-arrow-up-bold-outline"
+      aria-label="Voltar ao topo"
+      class="scroll-top-button"
+      @click="scrollToTop"
+    >
+      <q-tooltip>
+        Voltar ao topo
+      </q-tooltip>
+    </q-btn>
+  </transition>
+</template>
+
 <script setup lang="ts">
 import {
   onBeforeUnmount,
@@ -11,7 +35,7 @@ let ticking = false
 
 function updateVisibility() {
   const contactSection =
-    document.getElementById('contato')
+    document.getElementById('contact')
 
   if (!contactSection) {
     isVisible.value = false
@@ -65,30 +89,6 @@ onBeforeUnmount(() => {
   )
 })
 </script>
-
-<template>
-  <transition
-    enter-active-class="scroll-top-enter-active"
-    leave-active-class="scroll-top-leave-active"
-    enter-from-class="scroll-top-enter-from"
-    leave-to-class="scroll-top-leave-to"
-  >
-    <q-btn
-      v-if="isVisible"
-      round
-      unelevated
-      color="primary"
-      icon="mdi-arrow-up-bold-outline"
-      aria-label="Voltar ao topo"
-      class="scroll-top-button"
-      @click="scrollToTop"
-    >
-      <q-tooltip>
-        Voltar ao topo
-      </q-tooltip>
-    </q-btn>
-  </transition>
-</template>
 
 <style scoped>
 .scroll-top-button {
