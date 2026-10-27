@@ -21,6 +21,8 @@
           v-for="experience in visibleExperiences"
           :key="experience.id"
           :experience="experience"
+          :details-expanded="expandedExperienceId === experience.id"
+          @toggle-details="toggleExperienceDetails(experience.id, $event)"
         />
       </q-timeline>
 
@@ -39,9 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import ExperienceCard from './ExperienceCard.vue'
+
+const expandedExperienceId = ref<string | null>(null)
 
 const { isMobile, timelineLayout } = useMobile()
 const isHydrated = ref(false)
@@ -78,6 +82,10 @@ const layout = computed(() => {
 
   return timelineLayout.value
 })
+
+function toggleExperienceDetails(experienceId: string, isExpanded: boolean) {
+  expandedExperienceId.value = isExpanded ? experienceId : null
+}
 
 onMounted(() => {
   isHydrated.value = true

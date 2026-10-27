@@ -25,12 +25,17 @@
       {{ experience.description }}
     </div>
 
-    <div v-if="experienceDetailsForCurrent" class="q-mt-md">
-      <div class="text-subtitle1 text-weight-bold q-mb-sm">
-        {{ EXPERIENCE_DETAILS_HEADING }}
-      </div>
-
-      <ul class="q-pl-lg q-mt-none q-mb-none">
+    <q-expansion-item
+      v-if="experienceDetailsForCurrent"
+      :model-value="detailsExpanded"
+      @update:model-value="emit('toggleDetails', $event)"
+      :label="EXPERIENCE_DETAILS_HEADING"
+      icon="mdi-text-box-outline"
+      dense
+      header-class="text-subtitle1 text-weight-bold"
+      class="q-mt-md backdrop-blur experience-expansion"
+    >
+      <ul class="q-pl-lg q-mt-sm ">
         <li
           v-for="(responsibility, index) in experienceDetailsForCurrent.responsibilities"
           :key="index"
@@ -39,7 +44,7 @@
           {{ responsibility }}
         </li>
       </ul>
-    </div>
+    </q-expansion-item>
 
     <!-- Tecnologias -->
     <div v-if="experience.technologies?.length" class="row q-gutter-xs q-mt-lg">
@@ -61,6 +66,16 @@
 import { computed } from 'vue'
 
 const experienceDetailsForCurrent = computed(() => getExperienceDetails(props.experience.company))
+
+const props = defineProps<{
+  experience: Experience
+  detailsExpanded: boolean
+}>()
+
+const emit = defineEmits<{
+  toggleDetails: [expanded: boolean]
+}>()
+
 interface ExperienceTechnology {
   id: string
   name: string
@@ -84,11 +99,6 @@ interface Experience {
 interface ExperienceDetails {
   responsibilities: string[]
 }
-
-const props = defineProps<{
-  experience: Experience
-}>()
-
 const experienceLogos: Record<string, string> = {
   eterj: '/images/experiences/eterj.png',
   dt3sports: '/images/experiences/dt3.png',
@@ -208,10 +218,6 @@ function getExperienceDetails(company: string): ExperienceDetails | undefined {
   line-height: 1.7;
 }
 
-.experience-responsibilities {
-  line-height: 1.7;
-}
-
 .technology-chip {
   font-size: 12px;
 }
@@ -220,5 +226,22 @@ function getExperienceDetails(company: string): ExperienceDetails | undefined {
   width: 40px !important;
   height: 40px !important;
   object-fit: contain;
+}
+
+.experience-expansion {
+  border-radius: 8px;
+}
+
+.experience-responsibilities {
+  line-height: 1.7;
+  padding-left: 20px;
+}
+
+.experience-responsibilities li {
+  margin-bottom: 8px;
+}
+
+.experience-responsibilities li:last-child {
+  margin-bottom: 0;
 }
 </style>
