@@ -162,3 +162,4 @@ export function formatDate(date: string | null) {
     year: 'numeric',
   }).format(new Date(date))
 }
+

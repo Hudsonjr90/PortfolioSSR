@@ -19,9 +19,9 @@ model Profile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  experiences    Experience[]
-  education      Education[]
-  socialLinks    SocialLink[]
+  experiences Experience[]
+  education   Education[]
+  socialLinks SocialLink[]
 }
 
 model Project {
@@ -115,6 +115,7 @@ model Education {
   @@index([profileId])
   @@index([sortOrder])
 }
+
 model SocialLink {
   id        String  @id @default(cuid())
   profileId String

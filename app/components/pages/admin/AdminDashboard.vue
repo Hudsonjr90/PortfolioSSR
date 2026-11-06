@@ -202,7 +202,7 @@
           </div>
           <div v-else class="column q-gutter-md">
             <q-card
-              v-for="project in adminProjects"
+              v-for="project in paginatedProjects"
               :key="project.id"
               flat
               bordered
@@ -252,6 +252,17 @@
               </q-card-section>
             </q-card>
           </div>
+          <div v-if="projectTotalPages > 1" class="row justify-center q-mt-lg">
+            <q-pagination
+              v-model="projectCurrentPage"
+              :max="projectTotalPages"
+              :max-pages="5"
+              boundary-numbers
+              direction-links
+              color="primary"
+              aria-label="Paginação dos projetos"
+            />
+          </div>
         </div>
       </div>
 
@@ -267,6 +278,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import type { ProjectInput, ProjectRecord } from '#shared/types/project'
 import { resolveProjectAsset } from '~/utils/global'
+import { useAdminPagination } from '~/composables/useAdminPagination'
 import AdminEducationSection from './AdminEducationSection.vue'
 import AdminExperienceSection from './AdminExperienceSection.vue'
 import AdminTestimonialsSection from './AdminTestimonialsSection.vue'
@@ -331,6 +343,11 @@ const deletingId = ref<string | null>(null)
 const password = ref('')
 const editingId = ref<string | null>(null)
 const adminProjects = ref<ProjectRecord[]>([])
+const {
+  currentPage: projectCurrentPage,
+  totalPages: projectTotalPages,
+  paginatedRecords: paginatedProjects,
+} = useAdminPagination(adminProjects)
 const errorMessage = ref('')
 const successMessage = ref('')
 const form = reactive<ProjectForm>(emptyForm())

@@ -223,9 +223,9 @@ npm run db:seed
 No ambiente local, a rota `/admin` permite entrar com a senha definida em
 `DEV_ADMIN_PASSWORD` no `.env` e cadastrar, editar, publicar ou remover projetos.
 Essa área e suas APIs ficam indisponíveis quando a aplicação é executada em produção.
-O painel organiza formação acadêmica, experiência profissional, depoimentos e stack
-tecnológica em módulos próprios; por enquanto, a edição e persistência disponíveis são
-as de projetos.
+O painel também permite cadastrar, editar e remover formação acadêmica, experiências
+profissionais, depoimentos e tecnologias. As listas de todas as seções administrativas
+exibem até cinco registros por página.
 Imagens locais devem usar o nome do arquivo em `app/assets/images` (por exemplo,
 `agenda.png`); GIFs podem usar um caminho relativo como `gifs/agenda.gif`. Também é
 possível informar URLs públicas para imagens e GIFs.

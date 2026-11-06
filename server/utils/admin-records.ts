@@ -47,6 +47,13 @@ export function throwAdminRecordError(error: unknown, noun: string): never {
     if (error.code === 'P2002') {
       throw createError({ statusCode: 409, statusMessage: `${noun} already exists` })
     }
+
+    if (error.code === 'P2003') {
+      throw createError({
+        statusCode: 409,
+        statusMessage: `${noun} is still referenced by another record`,
+      })
+    }
   }
 
   throw error
