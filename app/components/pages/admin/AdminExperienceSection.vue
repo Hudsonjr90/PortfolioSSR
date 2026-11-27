@@ -63,10 +63,10 @@
                 maxlength="10000"
                 required
               />
-              <div class="row q-col-gutter-md">
+              <div class="row">
                 <q-input
                   v-model="form.startDate"
-                  class="col-12 col-sm-6"
+                  class="col-12 col-sm-4 q-mr-sm"
                   outlined
                   dense
                   type="date"
@@ -76,7 +76,7 @@
                 />
                 <q-input
                   v-model="form.endDate"
-                  class="col-12 col-sm-6"
+                  class="col-12 col-sm-4"
                   outlined
                   dense
                   type="date"
